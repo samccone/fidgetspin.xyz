@@ -3,7 +3,7 @@ const canvas = document.querySelector('canvas') as HTMLCanvasElement;
 const velocity = {r: 0, rotationVelocity: 0, maxVelocity: 100};
 const friction = -0.001;
 
-const imgDimensions = {width: 210, height: 220};
+const imgDimensions = {width: 200, height: 200};
 const touchInfo : {
   rateSamples: number;
   startX?: number;
@@ -12,8 +12,10 @@ const touchInfo : {
   lastY?: number;
 } = {rateSamples: 0};
 
-canvas.height = imgDimensions.height * window.devicePixelRatio;
-canvas.width = imgDimensions.width * window.devicePixelRatio;
+const dPR = window.devicePixelRatio;
+
+canvas.height = imgDimensions.height * dPR;
+canvas.width = imgDimensions.width * dPR;
 canvas.style.width = `${imgDimensions.width}px`;
 canvas.style.height = `${imgDimensions.height}px`;
 
@@ -32,10 +34,10 @@ async function boot() {
 function paint() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.save();
-  ctx.translate(window.devicePixelRatio * imgDimensions.width / 2, window.devicePixelRatio * imgDimensions.height / 2);
+  ctx.translate(dPR * imgDimensions.width / 2, dPR * imgDimensions.height / 2);
   ctx.rotate(velocity.r);
-  ctx.translate(-120 * window.devicePixelRatio, -109 * window.devicePixelRatio);
-  ctx.drawImage(img, 0, 0, imgDimensions.width * window.devicePixelRatio, imgDimensions.height * window.devicePixelRatio);
+  ctx.translate(-100 * dPR, -100 * dPR);
+  ctx.drawImage(img, 0, 0, imgDimensions.width * dPR, imgDimensions.height * dPR);
   ctx.restore();
 }
 
@@ -72,7 +74,7 @@ function touchEnd() {
     let touchSpeed = ((touchInfo.lastX! - touchInfo.startX!) / window.innerWidth) / touchInfo.rateSamples;
 
     if (velocity.rotationVelocity < velocity.maxVelocity) {
-      velocity.rotationVelocity += touchSpeed;
+      velocity.rotationVelocity -= touchSpeed;
     }
   }
 
