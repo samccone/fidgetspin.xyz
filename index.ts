@@ -20,23 +20,21 @@ async function boot() {
 
 
 function paint() {
-  requestAnimationFrame(() => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.save();
-    ctx.translate(imgDimensions.width / 2, imgDimensions.height / 2);
-    ctx.rotate(velocity.r);
-    ctx.translate(-120, -109);
-    ctx.drawImage(img, 0, 0, imgDimensions.width, imgDimensions.height);
-    ctx.restore();
-  });
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.save();
+  ctx.translate(imgDimensions.width / 2, imgDimensions.height / 2);
+  ctx.rotate(velocity.r);
+  ctx.translate(-120, -109);
+  ctx.drawImage(img, 0, 0, imgDimensions.width, imgDimensions.height);
+  ctx.restore();
 }
 
 function tick() {
-  setTimeout(() => {
-    velocity.r+= velocity.rotationVelocity;
+  requestAnimationFrame(() => {
+    velocity.r += velocity.rotationVelocity;
     paint();
     tick();
-  }, 16.66);
+  });
 }
 
 (async () => {
