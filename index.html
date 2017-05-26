@@ -10,10 +10,26 @@
         height: 100vh;
         overflow: hidden;
       }
+      #turns, #velocity {
+        position: absolute;
+        top: 20px;
+        font-size: 36px;
+        font-family: Roboto;
+        font-weight: bold;
+        width: 260px;
+        color: hsl(0, 0%, 36%);
+      }
+      #velocity {
+        top: auto;
+        bottom: 15px;
+      }
     </style>
   </head>
   <body>
     <canvas></canvas>
+    <div id="turns"></div>
+    <div id="velocity"></div>
+
     <script src="index.js"></script>
   </body>
 </html>

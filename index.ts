@@ -2,6 +2,11 @@ const img = new Image;
 const canvas = document.querySelector('canvas') as HTMLCanvasElement;
 const velocity = { r: 0, rotationVelocity: 0, maxVelocity: 100 };
 
+const statsElems = {
+  turns: document.querySelector('#turns')!,
+  velocity: document.querySelector('#velocity')!
+};
+
 interface Sample {
   xDistance: number;
   duration: number;
@@ -28,8 +33,10 @@ canvas.style.width = `${imgDimensions.width}px`;
 canvas.style.height = `${imgDimensions.height}px`;
 
 const ctx = canvas.getContext('2d')!;
-const fontHeight = 20;
-ctx.font = `${fontHeight * dPR}px 'Roboto'`;
+const fontHeight = 20 * dPR;
+ctx.font = `${fontHeight}px 'Roboto'`;
+
+let drewImage = false;
 
 async function boot() {
   return new Promise((res) => {
@@ -42,18 +49,19 @@ async function boot() {
 }
 
 function paint() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.save();
-  ctx.translate(dPR * imgDimensions.width / 2, dPR * imgDimensions.height / 2);
-  ctx.rotate(velocity.r);
-  ctx.translate(-150 * dPR, -150 * dPR);
-  ctx.drawImage(img, 0, 0, imgDimensions.width * dPR, imgDimensions.height * dPR);
-  ctx.restore();
+  canvas.style.transform = `rotate(${velocity.r}rad)`;
 
-  const velocityText = Math.abs(velocity.rotationVelocity * 100).toLocaleString(undefined, { maximumFractionDigits: 2 });
+  if (!drewImage) {
+    ctx.drawImage(img, 0, 0, imgDimensions.width * dPR, imgDimensions.height * dPR);
+    drewImage = true;
+  }
+}
+
+function stats() {
+  const velocityText = Math.abs(velocity.rotationVelocity * 100).toLocaleString(undefined, { maximumFractionDigits: 1 });
   const turnsText = (velocity.r / Math.PI).toLocaleString(undefined, { maximumFractionDigits: 1 });
-  ctx.fillText(`turns: ${turnsText}`, 0, fontHeight);
-  ctx.fillText(`velocity: ${velocityText}`, 0, canvas.height * dPR - fontHeight);
+  statsElems.turns.textContent = `turns: ${turnsText}`;
+  statsElems.velocity.textContent = `velocity: ${velocityText}`;
 }
 
 const easeOutQuad = (t: number) => t * (2 - t);
@@ -72,6 +80,7 @@ function tick() {
     }
 
     paint();
+    stats();
     tick();
   });
 }
