@@ -1,7 +1,16 @@
 const img = new Image;
 const canvas = document.querySelector('canvas') as HTMLCanvasElement;
-const velocity = {r: 0, rotationVelocity: 0.1};
+const velocity = {r: 0, rotationVelocity: 0, maxVelocity: 100};
+const friction = -0.001;
+
 const imgDimensions = {width: 210, height: 220};
+const touchInfo : {
+  rateSamples: number;
+  startX?: number;
+  startY?: number;
+  lastX?: number;
+  lastY?: number;
+} = {rateSamples: 0};
 
 canvas.height = imgDimensions.height;
 canvas.width = imgDimensions.width;
@@ -18,7 +27,6 @@ async function boot() {
   });
 }
 
-
 function paint() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.save();
@@ -31,13 +39,53 @@ function paint() {
 
 function tick() {
   requestAnimationFrame(() => {
-    velocity.r += velocity.rotationVelocity;
+    if (Math.abs(velocity.r) < velocity.maxVelocity) {
+      velocity.r += velocity.rotationVelocity;
+    }
+
+    if (velocity.rotationVelocity > friction && velocity.rotationVelocity > 0) {
+      velocity.rotationVelocity += friction;
+    }
+
+    if (velocity.rotationVelocity < friction && velocity.rotationVelocity < 0) {
+      velocity.rotationVelocity -= friction;
+    }
+
     paint();
     tick();
   });
 }
 
+function onTouchStart(e: TouchEvent) {
+  touchInfo.startX = e.touches[0].clientX;
+  touchInfo.startY = e.touches[0].clientX;
+}
+
+function onTouchMove(e: TouchEvent) {
+  touchInfo.lastX = e.touches[0].clientX;
+  touchInfo.lastY = e.touches[0].clientY;
+  touchInfo.rateSamples++;
+}
+
+function touchEnd() {
+  if (touchInfo.lastX !== undefined && touchInfo.lastY !== undefined) {
+    let touchSpeed = ((touchInfo.lastX! - touchInfo.startX!) / window.innerWidth) / touchInfo.rateSamples;
+
+    velocity.rotationVelocity += touchSpeed;
+  }
+
+  touchInfo.lastX = undefined;
+  touchInfo.lastY = undefined;
+  touchInfo.rateSamples = 0;
+}
+
+
 (async () => {
   await boot();
   tick();
+
+  document.body.addEventListener('touchstart', onTouchStart);
+  document.body.addEventListener('touchmove', onTouchMove);
+  document.body.addEventListener('touchend', touchEnd);
+  document.body.addEventListener('touchcancel', touchEnd);
 })();
