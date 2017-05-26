@@ -39,9 +39,7 @@ function paint() {
 
 function tick() {
   requestAnimationFrame(() => {
-    if (Math.abs(velocity.r) < velocity.maxVelocity) {
-      velocity.r += velocity.rotationVelocity;
-    }
+    velocity.r += velocity.rotationVelocity;
 
     if (velocity.rotationVelocity > friction && velocity.rotationVelocity > 0) {
       velocity.rotationVelocity += friction;
@@ -71,7 +69,9 @@ function touchEnd() {
   if (touchInfo.lastX !== undefined && touchInfo.lastY !== undefined) {
     let touchSpeed = ((touchInfo.lastX! - touchInfo.startX!) / window.innerWidth) / touchInfo.rateSamples;
 
-    velocity.rotationVelocity += touchSpeed;
+    if (velocity.rotationVelocity < velocity.maxVelocity) {
+      velocity.rotationVelocity += touchSpeed;
+    }
   }
 
   touchInfo.lastX = undefined;
