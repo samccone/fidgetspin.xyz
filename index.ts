@@ -12,8 +12,10 @@ const touchInfo : {
   lastY?: number;
 } = {rateSamples: 0};
 
-canvas.height = imgDimensions.height;
-canvas.width = imgDimensions.width;
+canvas.height = imgDimensions.height * window.devicePixelRatio;
+canvas.width = imgDimensions.width * window.devicePixelRatio;
+canvas.style.width = `${imgDimensions.width}px`;
+canvas.style.height = `${imgDimensions.height}px`;
 
 const ctx = canvas.getContext('2d')!;
 
@@ -30,10 +32,10 @@ async function boot() {
 function paint() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.save();
-  ctx.translate(imgDimensions.width / 2, imgDimensions.height / 2);
+  ctx.translate(window.devicePixelRatio * imgDimensions.width / 2, window.devicePixelRatio * imgDimensions.height / 2);
   ctx.rotate(velocity.r);
-  ctx.translate(-120, -109);
-  ctx.drawImage(img, 0, 0, imgDimensions.width, imgDimensions.height);
+  ctx.translate(-120 * window.devicePixelRatio, -109 * window.devicePixelRatio);
+  ctx.drawImage(img, 0, 0, imgDimensions.width * window.devicePixelRatio, imgDimensions.height * window.devicePixelRatio);
   ctx.restore();
 }
 
