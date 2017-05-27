@@ -58,7 +58,7 @@ async function boot() {
 }
 
 function paint() {
-  canvas.style.transform = `rotate(${velocity.r}rad)`;
+  canvas.style.transform = `translateY(-50%) rotate(${velocity.r}rad)`;
 
   if (!drewImage) {
     ctx.drawImage(img, 0, 0, imgDimensions.width * dPR, imgDimensions.height * dPR);
@@ -151,8 +151,8 @@ function resetLastTouch() {
   await boot();
   tick();
 
-  document.body.addEventListener('touchstart', onTouchStart);
-  document.body.addEventListener('touchmove', onTouchMove);
-  document.body.addEventListener('touchend', touchEnd);
-  document.body.addEventListener('touchcancel', touchEnd);
+  document.addEventListener('touchstart', onTouchStart);
+  document.addEventListener('touchmove', onTouchMove);
+  document.addEventListener('touchend', touchEnd);
+  document.addEventListener('touchcancel', touchEnd);
 })();

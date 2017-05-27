@@ -9,11 +9,13 @@
     <meta name="theme-color" content="#ffffff">
     <link rel="manifest" href="/manifest.json">
     <style>
+      html {
+        overflow: hidden;
+      }
       body {
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh;
         overflow: hidden;
       }
       #turns, #velocity {
@@ -29,6 +31,12 @@
         top: auto;
         bottom: 15px;
       }
+      canvas {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+      /*# sourceURL=style.css */
     </style>
   </head>
   <body>
