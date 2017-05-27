@@ -2,7 +2,7 @@
   "name": "Fidget Spinner",
   "short_name": "Fidget Spinner",
   "orientation": "portrait",
-  "theme_color": "#fffff",
+  "theme_color": "#ffffff",
   "background_color": "#ffffff",
   "display": "standalone",
   "start_url": "/",
