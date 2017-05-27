@@ -1,3 +1,12 @@
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').then(function() {
+    console.log('service worker is is all cool.');
+  }).catch(function(e) {
+    console.error('service worker is not so cool.', e);
+    throw e;
+  });
+}
+
 const img = new Image;
 const canvas = document.querySelector('canvas') as HTMLCanvasElement;
 const velocity = { r: 0, rotationVelocity: 0, maxVelocity: 100 };
