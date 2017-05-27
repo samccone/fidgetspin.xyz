@@ -9,46 +9,8 @@ if ('serviceWorker' in navigator) {
 
 declare const webkitAudioContext: AudioContext;
 
-
-// Returns a function, that, when invoked, will only be triggered at most once
-// during a given window of time. Normally, the throttled function will run
-// as much as it can, without ever going more than once per `wait` duration;
-// but if you'd like to disable the execution on the leading edge, pass
-// `{leading: false}`. To disable execution on the trailing edge, ditto.
-function throttle(func: Function, wait: number, options: any) {
-  var context: any, args:any, result: any;
-  var timeout:any = null;
-  var previous = 0;
-  if (!options) options = {};
-  var later = function() {
-    previous = options.leading === false ? 0 : Date.now();
-    timeout = null;
-    result = func.apply(context, args);
-    if (!timeout) context = args = null;
-  };
-  return function() {
-    var now = Date.now();
-    if (!previous && options.leading === false) previous = now;
-    var remaining = wait - (now - previous);
-    context = this;
-    args = arguments;
-    if (remaining <= 0 || remaining > wait) {
-      if (timeout) {
-        clearTimeout(timeout);
-        timeout = null;
-      }
-      previous = now;
-      result = func.apply(context, args);
-      if (!timeout) context = args = null;
-    } else if (!timeout && options.trailing !== false) {
-      timeout = setTimeout(later, remaining);
-    }
-    return result;
-  };
-};
-
 const img = new Image;
-const ac = new (typeof AudioContext !== 'undefined' ? AudioContext : webkitAudioContext)();
+const ac = new AudioContext();
 
 const canvas = document.querySelector('canvas') as HTMLCanvasElement;
 const velocity = { r: 0, rotationVelocity: 0, maxVelocity: 100 };
@@ -116,7 +78,6 @@ function stats() {
 }
 
 const easeOutQuad = (t: number) => t * (2 - t);
-const throttled = throttle(spinSound, 44, {});
 
 function tick() {
   requestAnimationFrame(() => {
@@ -126,10 +87,10 @@ function tick() {
       const timeSinceLastTouch = Date.now() - lastTouchEnd;
       const timeLeftPct = timeSinceLastTouch / timeRemaining;
       if (timeLeftPct < 1) {
-        //spinSound(1- timeLeftPct);
         const newVelocity = lastTouchVelocity - (easeOutQuad(timeLeftPct) * lastTouchVelocity);
         velocity.rotationVelocity = newVelocity;
-        throttled(Math.abs(newVelocity / velocity.maxVelocity * 200));
+        spinSound(Math.min(1, Math.abs(newVelocity / velocity.maxVelocity * 200)));
+        spinSound2(Math.min(1, Math.abs(newVelocity / velocity.maxVelocity * 200)));
       }
     }
 
@@ -192,15 +153,26 @@ function resetLastTouch() {
 }
 
 
+let endPlayTime = -1;
+let endPlayTime2 = -1;
+
 // assume magnitude is between 0 and 1
 function spinSound( magnitude: number ) {
+  // automation start time
+  let time = ac.currentTime;
+  let x = (easeOutQuad(magnitude) * 1.1) -(0.6 - (0.6 * easeOutQuad(magnitude)));
+
+  if (time + x - easeOutQuad(magnitude) < endPlayTime) {
+      return;
+  }
+
   const osc  = ac.createOscillator();
   const gain = ac.createGain();
 
   // enforce range
   magnitude = Math.min( 1, Math.max( 0, magnitude ) );
 
-  osc.type = 'square';
+  osc.type = 'triangle';
   osc.connect( gain );
   gain.connect( ac.destination );
 
@@ -209,8 +181,6 @@ function spinSound( magnitude: number ) {
   // decay constant for frequency between each boop
   //const decay = 0.97;
 
-  // automation start time
-  let time = ac.currentTime;
   // starting frequency (min of 400, max of 900)
   let freq = 400 + ( 400 * magnitude );
   // boop duration (longer for lower magnitude)
@@ -218,18 +188,55 @@ function spinSound( magnitude: number ) {
 
   osc.frequency.setValueAtTime( freq, time );
   osc.frequency.linearRampToValueAtTime( freq * 1.8, time += dur );
+  endPlayTime = time + dur;
 
   // fade out the last boop
-  gain.gain.setValueAtTime( 1, time );
-  gain.gain.linearRampToValueAtTime( 0, time += dur );
+  gain.gain.setValueAtTime(0.2,   ac.currentTime);
+  gain.gain.linearRampToValueAtTime( 0, endPlayTime );
 
   // play it
-  osc.start( ac.currentTime );
-  console.log(ac.currentTime, time)
-  osc.stop( time  );
+  osc.start(ac.currentTime);
+  osc.stop(endPlayTime);
 }
 
+function spinSound2( magnitude: number ) {
+  // automation start time
+  let time = ac.currentTime;
+  let x = (easeOutQuad(magnitude) * 1.1) -(0.3 - (0.3 * easeOutQuad(magnitude)));
 
+  if (time + x - easeOutQuad(magnitude) < endPlayTime2) {
+      return;
+  }
+
+  const osc  = ac.createOscillator();
+  const gain = ac.createGain();
+
+  // enforce range
+  magnitude = Math.min( 1, Math.max( 0, magnitude ) );
+
+  osc.type = 'sine';
+  osc.connect( gain );
+  gain.connect( ac.destination );
+
+  // max of 40 boops
+  //const count = 6 + ( 1 * magnitude );
+  // decay constant for frequency between each boop
+  //const decay = 0.97;
+
+  var freq = 300 + (300 * magnitude);
+  // boop duration (longer for lower magnitude)
+  var dur = 0.05 * (1 - magnitude / 2);
+  osc.frequency.setValueAtTime(freq, time);
+  osc.frequency.linearRampToValueAtTime(freq * 1.8, time += dur);
+  endPlayTime2 = time + dur;
+  // fade out the last boop
+  gain.gain.setValueAtTime(0.3, ac.currentTime);
+  gain.gain.linearRampToValueAtTime(0, endPlayTime2);
+
+  // play it
+  osc.start(ac.currentTime);
+  osc.stop(endPlayTime2);
+}
 (async () => {
   await boot();
   tick();
