@@ -19,7 +19,7 @@
         align-items: center;
         overflow: hidden;
       }
-      #turns, #velocity {
+      #turns, #velocity, #maxVelocity {
         position: absolute;
         top: 20px;
         font-size: 36px;
@@ -31,6 +31,9 @@
       #velocity {
         top: auto;
         bottom: 15px;
+      }
+      #maxVelocity {
+        top: 65px;
       }
       canvas {
         position: absolute;
@@ -44,6 +47,7 @@
     <canvas></canvas>
     <div id="turns"></div>
     <div id="velocity"></div>
+    <div id="maxVelocity"></div>
 
     <script src="index.js"></script>
   </body>

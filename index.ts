@@ -9,6 +9,7 @@ if ('serviceWorker' in navigator) {
 
 declare const webkitAudioContext: AudioContext;
 
+let maxVelocity = 0;
 const img = new Image;
 const ac = new AudioContext();
 
@@ -17,7 +18,8 @@ const velocity = { r: 0, rotationVelocity: 0, maxVelocity: 100 };
 
 const statsElems = {
   turns: document.querySelector('#turns')!,
-  velocity: document.querySelector('#velocity')!
+  velocity: document.querySelector('#velocity')!,
+  maxVelocity: document.querySelector('#maxVelocity')!
 };
 
 interface Sample {
@@ -71,10 +73,15 @@ function paint() {
 }
 
 function stats() {
-  const velocityText = Math.abs(velocity.rotationVelocity * 100).toLocaleString(undefined, { maximumFractionDigits: 1 });
-  const turnsText = (velocity.r / Math.PI).toLocaleString(undefined, { maximumFractionDigits: 1 });
+  const vel = Math.abs(velocity.rotationVelocity * 100);
+  maxVelocity = Math.max(vel, maxVelocity);
+  const velocityText = vel.toLocaleString(undefined, { maximumFractionDigits: 1 });
+  const turnsText = Math.abs(velocity.r / Math.PI).toLocaleString(undefined, { maximumFractionDigits: 1 });
+  const maxVelText = maxVelocity.toLocaleString(undefined, {maximumFractionDigits: 1});
+
   statsElems.turns.textContent = `turns: ${turnsText}`;
-  statsElems.velocity.textContent = `velocity: ${velocityText}`;
+  statsElems.velocity.textContent = `Speed: ${velocityText}`;
+  statsElems.maxVelocity.textContent = `Max Speed: ${maxVelText}`;
 }
 
 const easeOutQuad = (t: number) => t * (2 - t);
