@@ -9,8 +9,7 @@ if ('serviceWorker' in navigator) {
 
 let maxVelocity = 0;
 const img = new Image;
-const contextConstructor = webkitAudioContext || AudioContext;
-const ac = new (webkitAudioContext || AudioContext)();
+const ac = new (typeof webkitAudioContext !== 'undefined' ? webkitAudioContext : AudioContext)();
 
 const canvas = document.querySelector('canvas') as HTMLCanvasElement;
 const velocity = { r: 0, rotationVelocity: 0, maxVelocity: 100 };
@@ -47,9 +46,6 @@ canvas.style.width = `${imgDimensions.width}px`;
 canvas.style.height = `${imgDimensions.height}px`;
 
 const ctx = canvas.getContext('2d')!;
-const fontHeight = 20 * dPR;
-ctx.font = `${fontHeight}px 'Roboto'`;
-
 let drewImage = false;
 
 async function boot() {
@@ -78,9 +74,9 @@ function stats() {
   const turnsText = Math.abs(velocity.r / Math.PI).toLocaleString(undefined, { maximumFractionDigits: 1 });
   const maxVelText = maxVelocity.toLocaleString(undefined, {maximumFractionDigits: 1});
 
-  statsElems.turns.textContent = `turns: ${turnsText}`;
-  statsElems.velocity.textContent = `Speed: ${velocityText}`;
-  statsElems.maxVelocity.textContent = `Max Speed: ${maxVelText}`;
+  statsElems.turns.textContent = `${parseInt(turnsText, 10)}`;
+  statsElems.velocity.textContent = `${velocityText}`;
+  statsElems.maxVelocity.textContent = `${maxVelText}`;
 }
 
 const easeOutQuad = (t: number) => t * (2 - t);

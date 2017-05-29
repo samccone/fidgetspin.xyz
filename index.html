@@ -11,11 +11,34 @@
     <link rel="manifest" href="/manifest.json">
   </head>
   <body>
+    <div id="header">
+      <div class="turns">
+        <div class="spin-icon">
+          <div class="coin-lift">
+            <img class="spin-img spin-img-dark" src="/assets/dark_rotate.svg">
+            <img class="spin-img" src="/assets/rotate.svg">
+          </div>
+        </div>
+        <div class="turns-text">
+          <div id="turns">0</div>
+          <div class="turns-unit">spins</div>
+        </div>
+      </div>
+      <div class="speed">
+        <div class="velocity-display">
+          <div id="velocity">0</div>
+          <div class="velocity-unit">/sec</div>
+          <img class="speed-icon" src="/assets/speed_icon.svg">
+        </div>
+      </div>
+    </div>
     <canvas></canvas>
-    <div id="turns"></div>
-    <div id="velocity"></div>
-    <div id="maxVelocity"></div>
-
+    <div id="footer">
+      <div class="max-velocity">
+        <div class="max-velocity-unit">Top Speed: </div>
+        <div id="maxVelocity">0</div>
+      </div>
+    </div>
     <script src="index.js"></script>
   </body>
 </html>
