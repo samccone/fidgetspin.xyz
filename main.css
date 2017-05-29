@@ -1,0 +1,32 @@
+html {
+  overflow: hidden;
+  background: #f5f5f5;
+}
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+#turns, #velocity, #maxVelocity {
+  position: absolute;
+  top: 20px;
+  font-size: 36px;
+  font-family: 'Roboto', sans-serif;
+  font-weight: bold;
+  width: 260px;
+  color: hsl(0, 0%, 36%);
+}
+#velocity {
+  top: auto;
+  bottom: 15px;
+}
+#maxVelocity {
+  top: 65px;
+}
+canvas {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
