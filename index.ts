@@ -71,10 +71,10 @@ function stats() {
   const vel = Math.abs(velocity.rotationVelocity * 100);
   maxVelocity = Math.max(vel, maxVelocity);
   const velocityText = vel.toLocaleString(undefined, { maximumFractionDigits: 1 });
-  const turnsText = Math.abs(velocity.r / Math.PI).toLocaleString(undefined, { maximumFractionDigits: 1 });
+  const turnsText = Math.abs(velocity.r / Math.PI).toLocaleString(undefined, { maximumFractionDigits: 0 });
   const maxVelText = maxVelocity.toLocaleString(undefined, {maximumFractionDigits: 1});
 
-  statsElems.turns.textContent = `${parseInt(turnsText, 10)}`;
+  statsElems.turns.textContent = `${turnsText}`;
   statsElems.velocity.textContent = `${velocityText}`;
   statsElems.maxVelocity.textContent = `${maxVelText}`;
 }
