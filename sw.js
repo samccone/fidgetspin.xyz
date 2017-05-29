@@ -4,7 +4,12 @@ this.addEventListener('install', function(e) {
   e.waitUntil(caches.open(VERSION).then(cache => {
     return cache.addAll([
       '/',
+      '/assets/rotate.svg',
+      '/assets/dark_rotate.svg',
+      '/assets/speed_icon.svg',
+      '/assets/background.png',
       '/index.html',
+      '/main.css',
       '/sw.js',
       '/index.js'
     ]);
