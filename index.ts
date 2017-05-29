@@ -7,11 +7,10 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-declare const webkitAudioContext: AudioContext;
-
 let maxVelocity = 0;
 const img = new Image;
-const ac = new AudioContext();
+const contextConstructor = webkitAudioContext || AudioContext;
+const ac = new (webkitAudioContext || AudioContext)();
 
 const canvas = document.querySelector('canvas') as HTMLCanvasElement;
 const velocity = { r: 0, rotationVelocity: 0, maxVelocity: 100 };
@@ -224,11 +223,6 @@ function spinSound2( magnitude: number ) {
   osc.type = 'sine';
   osc.connect( gain );
   gain.connect( ac.destination );
-
-  // max of 40 boops
-  //const count = 6 + ( 1 * magnitude );
-  // decay constant for frequency between each boop
-  //const decay = 0.97;
 
   var freq = 300 + (300 * magnitude);
   // boop duration (longer for lower magnitude)
