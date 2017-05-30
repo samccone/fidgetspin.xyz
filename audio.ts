@@ -1,5 +1,6 @@
 import { generateRange } from './range';
-import { easeOutQuad } from './index';
+
+export const easeOutQuad = (t: number) => t * (2 - t);
 
 const ac = new (typeof webkitAudioContext !== 'undefined' ? webkitAudioContext : AudioContext)();
 let endPlayTime = -1;

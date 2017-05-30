@@ -1,10 +1,14 @@
 {
   "dependencies": {
-    "rollup-watch": "^3.2.2",
-    "typescript": "^2.3.3"
+  },
+  "scripts": {
+    "dev": "rollup -c -w",
+    "build": "rollup -c"
   },
   "devDependencies": {
     "rollup": "^0.41.6",
-    "rollup-plugin-typescript": "^0.8.1"
+    "rollup-plugin-typescript": "^0.8.1",
+    "rollup-watch": "^3.2.2",
+    "typescript": "^2.3.3"
   }
 }

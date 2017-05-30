@@ -1,4 +1,4 @@
-import { spinSound, spinSound2 } from './audio';
+import { spinSound, spinSound2, easeOutQuad } from './audio';
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').then(function() {
@@ -79,8 +79,6 @@ function stats() {
   statsElems.velocity.textContent = `${velocityText}`;
   statsElems.maxVelocity.textContent = `${maxVelText}`;
 }
-
-export const easeOutQuad = (t: number) => t * (2 - t);
 
 function tick() {
   requestAnimationFrame(() => {
