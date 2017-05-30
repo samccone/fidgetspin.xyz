@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "module": "amd",
+        "module": "system",
         "lib": [ "es2015", "dom" ],
         "target": "es5",
         "outFile": "index.js",
