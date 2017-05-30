@@ -1,8 +1,9 @@
 {
     "compilerOptions": {
-        "module": "es2015",
+        "module": "amd",
         "lib": [ "es2015", "dom" ],
         "target": "es5",
+        "outFile": "index.js",
         "noImplicitAny": true,
         "inlineSourceMap": true,
         "noEmitOnError": false,
