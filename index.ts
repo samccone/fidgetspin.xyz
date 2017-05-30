@@ -1,3 +1,5 @@
+import { generateRange } from './range';
+
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js').then(function() {
     console.log('service worker is is all cool.');
@@ -159,19 +161,6 @@ function resetLastTouch() {
 let endPlayTime = -1;
 let endPlayTime2 = -1;
 
-interface rangeArgs {
-  inputMin: number;
-  inputMax: number;
-  outputFloor: number;
-  outputCeil: number;
-};
-function generateRange(args: rangeArgs) {
-	return function (x: number):number {
-		const outputRange = args.outputCeil - args.outputFloor;
-		const inputPct = (x - args.inputMin) / (args.inputMax - args.inputMin);
-		return args.outputFloor + (inputPct * outputRange);
-  }
-}
 const freqRange400_2000 = generateRange({
   inputMin: 0,
   inputMax: 80,

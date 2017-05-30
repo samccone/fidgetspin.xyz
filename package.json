@@ -1,5 +1,10 @@
 {
   "dependencies": {
+    "rollup-watch": "^3.2.2",
     "typescript": "^2.3.3"
+  },
+  "devDependencies": {
+    "rollup": "^0.41.6",
+    "rollup-plugin-typescript": "^0.8.1"
   }
 }
