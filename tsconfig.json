@@ -3,6 +3,8 @@
         "module": "commonjs",
         "lib": [ "es2015", "dom" ],
         "target": "es5",
+        "removeComments": true,
+
         "noImplicitAny": true,
         "inlineSourceMap": true,
         "noEmitOnError": false,
