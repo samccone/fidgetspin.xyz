@@ -12,7 +12,7 @@ const img = new Image;
 const ac = new (typeof webkitAudioContext !== 'undefined' ? webkitAudioContext : AudioContext)();
 
 const canvas = document.querySelector('canvas') as HTMLCanvasElement;
-const velocity = { r: 0, rotationVelocity: 0, maxVelocity: 100 };
+const velocity = { r: 0, rotationVelocity: 0, maxVelocity: 10 };
 
 const statsElems = {
   turns: document.querySelector('#turns')!,
@@ -91,8 +91,9 @@ function tick() {
       if (timeLeftPct < 1) {
         const newVelocity = lastTouchVelocity - (easeOutQuad(timeLeftPct) * lastTouchVelocity);
         velocity.rotationVelocity = newVelocity;
-        spinSound(Math.min(1, Math.abs(newVelocity / velocity.maxVelocity * 200)));
-        spinSound2(Math.min(1, Math.abs(newVelocity / velocity.maxVelocity * 200)));
+        const soundMagnitude = Math.abs(newVelocity / velocity.maxVelocity * 200);
+        spinSound(soundMagnitude);
+        spinSound2(soundMagnitude);
       }
     }
 
@@ -158,10 +159,38 @@ function resetLastTouch() {
 let endPlayTime = -1;
 let endPlayTime2 = -1;
 
-// assume magnitude is between 0 and 1
+interface rangeArgs {
+  inputMin: number;
+  inputMax: number;
+  outputFloor: number;
+  outputCeil: number;
+};
+function generateRange(args: rangeArgs) {
+	return function (x: number):number {
+		const outputRange = args.outputCeil - args.outputFloor;
+		const inputPct = (x - args.inputMin) / (args.inputMax - args.inputMin);
+		return args.outputFloor + (inputPct * outputRange);
+  }
+}
+const freqRange400_2000 = generateRange({
+  inputMin: 0,
+  inputMax: 80,
+  outputFloor: 400,
+  outputCeil: 2000
+});
+const freqRange300_1500 = generateRange({
+  inputMin: 0,
+  inputMax: 80,
+  outputFloor: 300,
+  outputCeil: 1500
+});
+
+// assume magnitude is between 0 and 1, though it can be a tad higher
 function spinSound( magnitude: number ) {
   // automation start time
   let time = ac.currentTime;
+  const freqMagnitude = magnitude;
+  magnitude = Math.min(1, magnitude / 10);
   let x = (easeOutQuad(magnitude) * 1.1) -(0.6 - (0.6 * easeOutQuad(magnitude)));
 
   if (time + x - easeOutQuad(magnitude) < endPlayTime) {
@@ -184,16 +213,15 @@ function spinSound( magnitude: number ) {
   //const decay = 0.97;
 
   // starting frequency (min of 400, max of 900)
-  let freq = 400 + ( 400 * magnitude );
+  let freq = freqRange400_2000(freqMagnitude);
   // boop duration (longer for lower magnitude)
   let dur = 0.1 * ( 1 - magnitude / 2 );
-
   osc.frequency.setValueAtTime( freq, time );
   osc.frequency.linearRampToValueAtTime( freq * 1.8, time += dur );
   endPlayTime = time + dur;
 
   // fade out the last boop
-  gain.gain.setValueAtTime(0.2,   ac.currentTime);
+  gain.gain.setValueAtTime(0.1,   ac.currentTime);
   gain.gain.linearRampToValueAtTime( 0, endPlayTime );
 
   // play it
@@ -204,7 +232,9 @@ function spinSound( magnitude: number ) {
 function spinSound2( magnitude: number ) {
   // automation start time
   let time = ac.currentTime;
-  let x = (easeOutQuad(magnitude) * 1.1) -(0.3 - (0.3 * easeOutQuad(magnitude)));
+  const freqMagnitude = magnitude;
+  magnitude = Math.min(1, magnitude / 10);
+  let x = (easeOutQuad(magnitude) * 1.1) - (0.3 - (0.3 * easeOutQuad(magnitude)));
 
   if (time + x - easeOutQuad(magnitude) < endPlayTime2) {
       return;
@@ -220,14 +250,14 @@ function spinSound2( magnitude: number ) {
   osc.connect( gain );
   gain.connect( ac.destination );
 
-  var freq = 300 + (300 * magnitude);
+  var freq = freqRange300_1500(freqMagnitude);
   // boop duration (longer for lower magnitude)
   var dur = 0.05 * (1 - magnitude / 2);
   osc.frequency.setValueAtTime(freq, time);
   osc.frequency.linearRampToValueAtTime(freq * 1.8, time += dur);
   endPlayTime2 = time + dur;
   // fade out the last boop
-  gain.gain.setValueAtTime(0.3, ac.currentTime);
+  gain.gain.setValueAtTime(0.15, ac.currentTime);
   gain.gain.linearRampToValueAtTime(0, endPlayTime2);
 
   // play it
