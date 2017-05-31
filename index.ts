@@ -114,6 +114,7 @@ function onTouchStart(e: TouchEvent) {
   touchInfo.startAlpha = Math.atan2(e.touches[0].clientX - centerX, e.touches[0].clientY - centerY);
   touchInfo.startTimestamp = e.timeStamp;
   startVelocityR = velocity.r;
+  e.preventDefault();
 }
 
 function onTouchMove(e: TouchEvent) {
