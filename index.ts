@@ -109,6 +109,7 @@ function onTouchStart(e: TouchEvent) {
   touchInfo.startX = e.touches[0].clientX;
   touchInfo.startY = e.touches[0].clientX;
   touchInfo.lastTimestamp = e.timeStamp;
+  e.preventDefault();
 }
 
 function onTouchMove(e: TouchEvent) {
@@ -128,6 +129,7 @@ function onTouchMove(e: TouchEvent) {
   touchInfo.startX = touchInfo.lastX;
   touchInfo.startY = touchInfo.lastY;
   touchInfo.lastTimestamp = e.timeStamp;
+  e.preventDefault();
 }
 
 function touchEnd() {
@@ -266,12 +268,30 @@ function spinSound2( magnitude: number ) {
   osc.start(ac.currentTime);
   osc.stop(endPlayTime2);
 }
+
+
+interface WhatWGEventListenerArgs {
+  capture?: boolean;
+}
+
+interface WhatWGAddEventListenerArgs extends WhatWGEventListenerArgs {
+  passive?: boolean;
+  once?: boolean;
+}
+
+type WhatWGAddEventListener = (
+  type: string,
+  listener: (event: Event) => void,
+  options?: WhatWGAddEventListenerArgs
+) => void;
+
+
 (async () => {
   await boot();
   tick();
 
-  document.addEventListener('touchstart', onTouchStart);
-  document.addEventListener('touchmove', onTouchMove);
-  document.addEventListener('touchend', touchEnd);
-  document.addEventListener('touchcancel', touchEnd);
+  (document.addEventListener as WhatWGAddEventListener)('touchstart', onTouchStart, {passive: false});
+  (document.addEventListener as WhatWGAddEventListener)('touchmove', onTouchMove, {passive: false});
+  (document.addEventListener as WhatWGAddEventListener)('touchend', touchEnd);
+  (document.addEventListener as WhatWGAddEventListener)('touchcancel', touchEnd);
 })();
