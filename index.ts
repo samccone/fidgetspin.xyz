@@ -21,18 +21,17 @@ const statsElems = {
 };
 
 interface Sample {
-  xDistance: number;
+  alphaDistance: number;
   duration: number;
 };
 
 const imgDimensions = { width: 300, height: 300 };
 const touchInfo: {
-  startX?: number;
-  startY?: number;
-  lastX?: number;
-  lastY?: number;
+  startAlpha?: number;
+  lastAlpha?: number;
   samples: Sample[];
   lastTimestamp?: number;
+  startTimestamp?: number;
 } = { samples: [] };
 
 const dPR = window.devicePixelRatio;
@@ -105,52 +104,40 @@ function tick() {
   });
 }
 
+const canvasPos = canvas.getBoundingClientRect()
+const centerX = canvasPos.left + canvasPos.width / 2;
+const centerY = canvasPos.top + canvasPos.height / 2;
+
+let startVelocityR = 0;
+
 function onTouchStart(e: TouchEvent) {
-  touchInfo.startX = e.touches[0].clientX;
-  touchInfo.startY = e.touches[0].clientX;
-  touchInfo.lastTimestamp = e.timeStamp;
-  e.preventDefault();
+  touchInfo.startAlpha = Math.atan2(e.touches[0].clientX - centerX, e.touches[0].clientY - centerY);
+  touchInfo.startTimestamp = e.timeStamp;
+  startVelocityR = velocity.r;
 }
 
 function onTouchMove(e: TouchEvent) {
-  touchInfo.lastX = e.touches[0].clientX;
-  touchInfo.lastY = e.touches[0].clientY;
+  touchInfo.lastAlpha = Math.atan2(e.touches[0].clientX - centerX, e.touches[0].clientY - centerY);
 
-  touchInfo.samples.push({
-    xDistance: touchInfo.lastX - touchInfo.startX!,
-    duration: e.timeStamp - touchInfo.lastTimestamp!
-  });
+  if (Math.abs(velocity.rotationVelocity) < 0.05)
+  velocity.r = startVelocityR - touchInfo.lastAlpha!;
 
-  if (touchInfo.samples.length >= 3) {
-    updateVelocity(touchInfo.samples);
-    touchInfo.samples = [];
-  }
-
-  touchInfo.startX = touchInfo.lastX;
-  touchInfo.startY = touchInfo.lastY;
   touchInfo.lastTimestamp = e.timeStamp;
   e.preventDefault();
 }
 
 function touchEnd() {
-  updateVelocity(touchInfo.samples);
-  touchInfo.samples = [];
-}
+  lastTouchEnd = Date.now();
+  let distance = (touchInfo.lastAlpha! - touchInfo.startAlpha!);
+  if (distance > Math.PI) distance -= 2 * Math.PI;
+  if (distance < -Math.PI) distance += 2 * Math.PI;
+  const angleSpeed = 20 * distance / (touchInfo.lastTimestamp! - touchInfo.startTimestamp!);
 
+  // TODO: if angleSpeed is more than a certain value, then keep increasing it.
 
-function updateVelocity(samples: Sample[]) {
-  const multiplier = 25;
-
-  const totalDistance = samples.reduce((total, curr) => total += curr.xDistance, 0);
-  const totalDuration = samples.reduce((total, curr) => total += curr.duration, 0);
-  const touchSpeed = totalDistance / totalDuration / multiplier;
-
-  if (!Number.isFinite(touchSpeed)) return;
-
-  if (Math.abs(velocity.rotationVelocity) < velocity.maxVelocity) {
-    velocity.rotationVelocity -= touchSpeed;
+  if (Math.abs(angleSpeed) > Math.abs(velocity.rotationVelocity)) {
+    velocity.rotationVelocity = -angleSpeed;
   }
-
   resetLastTouch();
 }
 
