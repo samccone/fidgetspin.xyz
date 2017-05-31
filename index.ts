@@ -36,7 +36,7 @@ const touchInfo: {
 } = { samples: [] };
 
 const dPR = window.devicePixelRatio;
-let timeRemaining = 5000;
+let slowDownDuration = 5000;
 let lastTouchEnd: number;
 let lastTouchVelocity: number;
 
@@ -87,13 +87,15 @@ function tick() {
 
     if (lastTouchEnd) {
       const timeSinceLastTouch = Date.now() - lastTouchEnd;
-      const timeLeftPct = timeSinceLastTouch / timeRemaining;
-      if (timeLeftPct < 1) {
+      const timeLeftPct = timeSinceLastTouch / slowDownDuration;
+      if (timeSinceLastTouch < slowDownDuration) {
         const newVelocity = lastTouchVelocity - (easeOutQuad(timeLeftPct) * lastTouchVelocity);
         velocity.rotationVelocity = newVelocity;
         const soundMagnitude = Math.abs(newVelocity / velocity.maxVelocity * 200);
         spinSound(soundMagnitude);
         spinSound2(soundMagnitude);
+      } else {
+        velocity.rotationVelocity = 0;
       }
     }
 
