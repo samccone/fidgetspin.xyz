@@ -7,16 +7,16 @@ this.addEventListener('fetch', e => e.respondWith(swFetch(e)));
 async function swInstall(e) {
   const cache = await caches.open(VERSION);
   return cache.addAll([
-    '/',
-    '/spinner.svg',
-    '/assets/rotate.svg',
-    '/assets/dark_rotate.svg',
-    '/assets/speed_icon.svg',
-    '/assets/background.png',
-    '/index.html',
-    '/main.css',
-    '/sw.js',
-    '/index.js'
+    './',
+    './spinner.svg',
+    './assets/rotate.svg',
+    './assets/dark_rotate.svg',
+    './assets/speed_icon.svg',
+    './assets/background.png',
+    './index.html',
+    './main.css',
+    './sw.js',
+    './index.js'
   ]);
 }
 
