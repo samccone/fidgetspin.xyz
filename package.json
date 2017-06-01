@@ -1,12 +1,17 @@
 {
   "scripts": {
-    "build-css": "cat assets/main.css | ./node_modules/.bin/postcss --use ../../node_modules/autoprefixer/lib/autoprefixer.js > main.css"
+    "build-css": "cat assets/main.css | ./node_modules/.bin/postcss --use ../../node_modules/autoprefixer/lib/autoprefixer.js > main.css",
+    "build": "tsc && yarn run build-css",
+    "watch": "tsc -w",
+    "start": "http-server",
+    "now-start": "http-server -p 80"
   },
   "dependencies": {
     "typescript": "^2.3.3"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.1",
-    "postcss-cli": "^4.0.0"
+    "postcss-cli": "^4.0.0",
+    "http-server": "^0.10.0"
   }
 }
