@@ -83,15 +83,19 @@ const touchInfo: {
 let touchSpeed = 0;
 let lastTouchAlpha = 0;
 
-function onTouchStart(e: TouchEvent) {
-  touchInfo.alpha = Math.atan2(e.touches[0].clientX - centerX, e.touches[0].clientY - centerY);
-  lastTouchAlpha = touchInfo.alpha;
-  touchInfo.down = true;
+function onTouchStart(e: PointerEvent) {
+  if (e.isPrimary) {
+    touchInfo.alpha = Math.atan2(e.clientX - centerX, e.clientY - centerY);
+    lastTouchAlpha = touchInfo.alpha;
+    touchInfo.down = true;
+  }
   e.preventDefault();
 }
 
-function onTouchMove(e: TouchEvent) {
-  touchInfo.alpha = Math.atan2(e.touches[0].clientX - centerX, e.touches[0].clientY - centerY);
+function onTouchMove(e: PointerEvent) {
+  if (e.isPrimary) {
+    touchInfo.alpha = Math.atan2(e.clientX - centerX, e.clientY - centerY);
+  }
   e.preventDefault();
 }
 
@@ -268,8 +272,8 @@ type WhatWGAddEventListener = (
   await boot();
   tick();
 
-  (document.addEventListener as WhatWGAddEventListener)('touchstart', onTouchStart, {passive: false});
-  (document.addEventListener as WhatWGAddEventListener)('touchmove', onTouchMove, {passive: false});
-  (document.addEventListener as WhatWGAddEventListener)('touchend', touchEnd);
-  (document.addEventListener as WhatWGAddEventListener)('touchcancel', touchEnd);
+  (document.addEventListener as WhatWGAddEventListener)('pointerdown', onTouchStart, {passive: false});
+  (document.addEventListener as WhatWGAddEventListener)('pointermove', onTouchMove, {passive: false});
+  (document.addEventListener as WhatWGAddEventListener)('pointerup', touchEnd);
+  (document.addEventListener as WhatWGAddEventListener)('pointercancel', touchEnd);
 })();
