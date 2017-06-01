@@ -47,7 +47,7 @@ let fidgetSpeed = 0;
 let turnCount = 0;
 
 function paint() {
-  canvas.style.transform = `translateY(-50%) rotate(${fidgetAlpha}rad)`;
+  canvas.style.transform = `translateX(-50%) translateY(-50%) rotate(${fidgetAlpha}rad)`;
   if (!drewImage) {
     ctx.drawImage(img, 0, 0, imgDimensions.width * dPR, imgDimensions.height * dPR);
     drewImage = true;
