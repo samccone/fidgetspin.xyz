@@ -1,4 +1,4 @@
-var VERSION = '6';
+var VERSION = '7';
 
 this.addEventListener('install', function(e) {
   e.waitUntil(caches.open(VERSION).then(cache => {
