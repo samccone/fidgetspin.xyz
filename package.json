@@ -1,5 +1,12 @@
 {
+  "scripts": {
+    "build-css": "cat assets/main.css | ./node_modules/.bin/postcss --use ../../node_modules/autoprefixer/lib/autoprefixer.js > main.css"
+  },
   "dependencies": {
     "typescript": "^2.3.3"
+  },
+  "devDependencies": {
+    "autoprefixer": "^7.1.1",
+    "postcss-cli": "^4.0.0"
   }
 }
