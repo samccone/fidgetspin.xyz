@@ -15,6 +15,9 @@ const ac = new (typeof webkitAudioContext !== 'undefined' ? webkitAudioContext :
 
 const canvas = document.querySelector('canvas') as HTMLCanvasElement;
 
+// thx https://github.com/Modernizr/Modernizr/blob/master/feature-detects/pointerevents.js
+const hasPointerEvts = 'onpointerdown' in document.createElement('div');
+
 const statsElems = {
   turns: document.querySelector('#turns')!,
   velocity: document.querySelector('#velocity')!,
@@ -75,6 +78,14 @@ const centerY = canvasPos.top + canvasPos.height / 2;
 // Spin code
 //
 
+function getPrimaryTouch(e: PointerEvent) {
+  if (hasPointerEvts && !e.isPrimary) return false;
+  if (!hasPointerEvts)
+    e = (e as any).touches[0];
+  return true;
+}
+
+
 const touchInfo: {
   alpha: number;
   down: boolean;
@@ -84,18 +95,17 @@ let touchSpeed = 0;
 let lastTouchAlpha = 0;
 
 function onTouchStart(e: PointerEvent) {
-  if (e.isPrimary) {
-    touchInfo.alpha = Math.atan2(e.clientX - centerX, e.clientY - centerY);
-    lastTouchAlpha = touchInfo.alpha;
-    touchInfo.down = true;
-  }
+  if (!getPrimaryTouch(e)) return;
+  touchInfo.alpha = Math.atan2(e.clientX - centerX, e.clientY - centerY);
+  lastTouchAlpha = touchInfo.alpha;
+  touchInfo.down = true;
+
   e.preventDefault();
 }
 
 function onTouchMove(e: PointerEvent) {
-  if (e.isPrimary) {
-    touchInfo.alpha = Math.atan2(e.clientX - centerX, e.clientY - centerY);
-  }
+  if (!getPrimaryTouch(e)) return;
+  touchInfo.alpha = Math.atan2(e.clientX - centerX, e.clientY - centerY);
   e.preventDefault();
 }
 
@@ -272,8 +282,9 @@ type WhatWGAddEventListener = (
   await boot();
   tick();
 
-  (document.addEventListener as WhatWGAddEventListener)('pointerdown', onTouchStart, {passive: false});
-  (document.addEventListener as WhatWGAddEventListener)('pointermove', onTouchMove, {passive: false});
-  (document.addEventListener as WhatWGAddEventListener)('pointerup', touchEnd);
-  (document.addEventListener as WhatWGAddEventListener)('pointercancel', touchEnd);
+  const documentaddEventListener = document.addEventListener.bind(document) as WhatWGAddEventListener;
+  documentaddEventListener(hasPointerEvts ? 'pointerdown' : 'touchstart', onTouchStart, {passive: false});
+  documentaddEventListener(hasPointerEvts ? 'pointermove' : 'touchmove', onTouchMove, {passive: false});
+  documentaddEventListener(hasPointerEvts ? 'pointerup' : 'touchend', touchEnd);
+  documentaddEventListener(hasPointerEvts ? 'pointercancel' : 'touchcancel', touchEnd);
 })();
