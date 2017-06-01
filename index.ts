@@ -7,12 +7,13 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-let maxVelocity = 0;
+let velocity = 0;
+let maxVelocity = 0.01;
+
 const img = new Image;
 const ac = new (typeof webkitAudioContext !== 'undefined' ? webkitAudioContext : AudioContext)();
 
 const canvas = document.querySelector('canvas') as HTMLCanvasElement;
-const velocity = { r: 0, rotationVelocity: 0, maxVelocity: 10 };
 
 const statsElems = {
   turns: document.querySelector('#turns')!,
@@ -20,24 +21,8 @@ const statsElems = {
   maxVelocity: document.querySelector('#maxVelocity')!
 };
 
-interface Sample {
-  alphaDistance: number;
-  duration: number;
-};
-
 const imgDimensions = { width: 300, height: 300 };
-const touchInfo: {
-  startAlpha?: number;
-  lastAlpha?: number;
-  samples: Sample[];
-  lastTimestamp?: number;
-  startTimestamp?: number;
-} = { samples: [] };
-
 const dPR = window.devicePixelRatio;
-let slowDownDuration = 5000;
-let lastTouchEnd: number;
-let lastTouchVelocity: number;
 
 canvas.height = imgDimensions.height * dPR;
 canvas.width = imgDimensions.width * dPR;
@@ -57,9 +42,12 @@ async function boot() {
   });
 }
 
-function paint() {
-  canvas.style.transform = `translateY(-50%) rotate(${velocity.r}rad)`;
+let fidgetAlpha = 0;
+let fidgetSpeed = 0;
+let turnCount = 0;
 
+function paint() {
+  canvas.style.transform = `translateY(-50%) rotate(${fidgetAlpha}rad)`;
   if (!drewImage) {
     ctx.drawImage(img, 0, 0, imgDimensions.width * dPR, imgDimensions.height * dPR);
     drewImage = true;
@@ -67,10 +55,11 @@ function paint() {
 }
 
 function stats() {
-  const vel = Math.abs(velocity.rotationVelocity * 100);
-  maxVelocity = Math.max(vel, maxVelocity);
-  const velocityText = vel.toLocaleString(undefined, { maximumFractionDigits: 1 });
-  const turnsText = Math.abs(velocity.r / Math.PI).toLocaleString(undefined, { maximumFractionDigits: 0 });
+  velocity = Math.abs(fidgetSpeed * 60);
+  maxVelocity = Math.max(velocity, maxVelocity);
+  const velocityText = velocity.toLocaleString(undefined, { maximumFractionDigits: 1 });
+  turnCount += Math.abs(fidgetSpeed / 2 / Math.PI);
+  const turnsText = turnCount.toLocaleString(undefined, { maximumFractionDigits: 0 });
   const maxVelText = maxVelocity.toLocaleString(undefined, {maximumFractionDigits: 1});
 
   statsElems.turns.textContent = `${turnsText}`;
@@ -78,75 +67,74 @@ function stats() {
   statsElems.maxVelocity.textContent = `${maxVelText}`;
 }
 
-const easeOutQuad = (t: number) => t * (2 - t);
-
-function tick() {
-  requestAnimationFrame(() => {
-    velocity.r += velocity.rotationVelocity;
-
-    if (lastTouchEnd) {
-      const timeSinceLastTouch = Date.now() - lastTouchEnd;
-      const timeLeftPct = timeSinceLastTouch / slowDownDuration;
-      if (timeSinceLastTouch < slowDownDuration) {
-        const newVelocity = lastTouchVelocity - (easeOutQuad(timeLeftPct) * lastTouchVelocity);
-        velocity.rotationVelocity = newVelocity;
-        const soundMagnitude = Math.abs(newVelocity / velocity.maxVelocity * 200);
-        spinSound(soundMagnitude);
-        spinSound2(soundMagnitude);
-      } else {
-        velocity.rotationVelocity = 0;
-      }
-    }
-
-    paint();
-    stats();
-    tick();
-  });
-}
-
 const canvasPos = canvas.getBoundingClientRect()
 const centerX = canvasPos.left + canvasPos.width / 2;
 const centerY = canvasPos.top + canvasPos.height / 2;
 
-let startVelocityR = 0;
+//
+// Spin code
+//
+
+const touchInfo: {
+  alpha: number;
+  down: boolean;
+} = { alpha: 0, down: false };
+
+let touchSpeed = 0;
+let lastTouchAlpha = 0;
 
 function onTouchStart(e: TouchEvent) {
-  touchInfo.startAlpha = Math.atan2(e.touches[0].clientX - centerX, e.touches[0].clientY - centerY);
-  touchInfo.startTimestamp = e.timeStamp;
-  startVelocityR = velocity.r;
+  touchInfo.alpha = Math.atan2(e.touches[0].clientX - centerX, e.touches[0].clientY - centerY);
+  lastTouchAlpha = touchInfo.alpha;
+  touchInfo.down = true;
   e.preventDefault();
 }
 
 function onTouchMove(e: TouchEvent) {
-  touchInfo.lastAlpha = Math.atan2(e.touches[0].clientX - centerX, e.touches[0].clientY - centerY);
-
-  if (Math.abs(velocity.rotationVelocity) < 0.05)
-  velocity.r = startVelocityR - touchInfo.lastAlpha!;
-
-  touchInfo.lastTimestamp = e.timeStamp;
+  touchInfo.alpha = Math.atan2(e.touches[0].clientX - centerX, e.touches[0].clientY - centerY);
   e.preventDefault();
 }
 
 function touchEnd() {
-  lastTouchEnd = Date.now();
-  let distance = (touchInfo.lastAlpha! - touchInfo.startAlpha!);
-  if (distance > Math.PI) distance -= 2 * Math.PI;
-  if (distance < -Math.PI) distance += 2 * Math.PI;
-  const angleSpeed = 20 * distance / (touchInfo.lastTimestamp! - touchInfo.startTimestamp!);
-
-  // TODO: if angleSpeed is more than a certain value, then keep increasing it.
-
-  if (Math.abs(angleSpeed) > Math.abs(velocity.rotationVelocity)) {
-    velocity.rotationVelocity = -angleSpeed;
-  }
-  resetLastTouch();
+  touchInfo.down = false;
 }
 
-function resetLastTouch() {
-  lastTouchEnd = Date.now();
-  lastTouchVelocity = velocity.rotationVelocity;
+const friction = 0.1;
+
+function tick() {
+  requestAnimationFrame(() => {
+    if (touchInfo.down) {
+       touchSpeed = touchInfo.alpha - lastTouchAlpha;
+       if (touchSpeed < - Math.PI)
+         touchSpeed += 2 * Math.PI;
+       if (touchSpeed > Math.PI)
+         touchSpeed -= 2 * Math.PI;
+       // Apply friction
+       const boost = 1 + 10 * Math.min(1, Math.abs(fidgetSpeed));
+       fidgetSpeed = (1 - friction) * fidgetSpeed + friction * boost * touchSpeed;
+       lastTouchAlpha = touchInfo.alpha;
+    }
+    fidgetAlpha -= fidgetSpeed;
+    paint();
+    stats();
+    tick();
+
+    // Slow down over time
+    fidgetSpeed = fidgetSpeed * 0.99;
+    fidgetSpeed = Math.sign(fidgetSpeed) * Math.max(0, (Math.abs(fidgetSpeed) - 2e-4));
+
+    const soundMagnitude = Math.abs(velocity / 2);
+    if (soundMagnitude) {
+      spinSound(soundMagnitude);
+      spinSound2(soundMagnitude);
+    }
+  });
 }
 
+
+//
+// Audio code
+//
 
 let endPlayTime = -1;
 let endPlayTime2 = -1;
@@ -176,6 +164,8 @@ const freqRange300_1500 = generateRange({
   outputFloor: 300,
   outputCeil: 1500
 });
+
+const easeOutQuad = (t: number) => t * (2 - t);
 
 // assume magnitude is between 0 and 1, though it can be a tad higher
 function spinSound( magnitude: number ) {
