@@ -29,6 +29,11 @@ async function swFetch(e) {
 }
 
 async function fetchFromNetworkAndCache(e) {
+  if (new URL(e.request.url).origin !== location.origin) {
+    return new Response(new Blob(),
+                        {"status" : 404, "statusText" : "Not found"});
+  }
+
   const res = await fetch(e.request);
   if (!res.url) {
     // foreign requests will be res.type === 'opaque' and missing a url
