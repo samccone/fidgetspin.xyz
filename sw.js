@@ -5,19 +5,10 @@ this.addEventListener('activate', e => e.waitUntil(swActivate(e)));
 this.addEventListener('fetch', e => e.respondWith(swFetch(e)));
 
 async function swInstall(e) {
+  const rs = await fetch('./bundle.txt');
+  const body = await rs.text();
   const cache = await caches.open(VERSION);
-  return cache.addAll([
-    './',
-    './spinner.svg',
-    './assets/rotate.svg',
-    './assets/dark_rotate.svg',
-    './assets/speed_icon.svg',
-    './assets/background.png',
-    './index.html',
-    './main.css',
-    './sw.js',
-    './index.js'
-  ]);
+  return cache.addAll(body.trim().split('\n'));
 }
 
 async function swActivate(e) {
