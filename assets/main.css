@@ -1,5 +1,6 @@
 * {
   box-sizing: border-box;
+  user-select: none;
 }
 
 html {
@@ -7,6 +8,7 @@ html {
   background: #f5f5f5 url(/assets/background.png);
   font-family: 'Roboto', sans-serif;
 }
+
 body {
   display: flex;
   align-items: center;
@@ -24,20 +26,18 @@ canvas {
   background: #ff4f75;
   bottom: 0px;
   position: absolute;
-  width: 50%;
   border-radius: 30px;
-  margin-bottom: 20px;
   padding: 20px;
-  box-shadow: 0px 10px 10px 0px #bd9b9b;
-  border-bottom: 4px solid #9f4357;
+  box-shadow: 0px -2px 6px 0px #e4c6c6;
   color: #fff;
-  text-shadow: 0px 2px 0px rgba(219, 18, 96, 0.5);
+  text-shadow: 0px 3px 0px rgba(219, 18, 96, 0.5);
   text-align: center;
   font-weight: bold;
   overflow: hidden;
-  min-width: 290px;
-  left: 50%;
-  transform: translateX(-50%);
+  width: 100%;
+  border-radius: 0;
+  left: 0;
+  bottom: 0;
 }
 
 .speed {
@@ -82,12 +82,12 @@ canvas {
 
 .max-velocity-unit {
   display: inline-block;
-  font-size: 18px;
+  font-size: 24px;
   margin-right: 10px;
 }
 
 #maxVelocity {
-  font-size: 33px;
+  font-size: 42px;
   display: inline-block;
   text-align: left;
 }
