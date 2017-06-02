@@ -27,12 +27,26 @@
       <div class="speed">
         <div class="velocity-display">
           <div id="velocity">0</div>
-          <div class="velocity-unit">/sec</div>
+          <div class="velocity-unit"> RPM</div>
           <img class="speed-icon" src="./assets/speed_icon.svg">
         </div>
       </div>
     </div>
-    <canvas></canvas>
+    <div id='spinner'>
+      <img src='spinner.svg'>
+      <div id='trace-slow'>
+        <img class='spinner-trace-1' src='spinner.svg'>
+        <img class='spinner-trace-2' src='spinner.svg'>
+        <img class='spinner-trace-5' src='spinner.svg'>
+        <img class='spinner-trace-6' src='spinner.svg'>
+      </div>
+      <div id='trace-fast'>
+        <img class='spinner-trace-3' src='spinner.svg'>
+        <img class='spinner-trace-4' src='spinner.svg'>
+        <img class='spinner-trace-7' src='spinner.svg'>
+        <img class='spinner-trace-8' src='spinner.svg'>
+      </div>
+    </div>
     <div id="footer">
       <div class="max-velocity">
         <div class="max-velocity-unit">Top Speed: </div>

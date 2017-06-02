@@ -8,71 +8,42 @@ if ('serviceWorker' in navigator) {
 }
 
 // thx https://github.com/Modernizr/Modernizr/blob/master/feature-detects/pointerevents.js
-const HAS_POINTER_EVENTS = 'onpointerdown' in document.createElement('div');
+const USE_POINTER_EVENTS = !('ontouchstart' in (window as any)['__proto__']);
 
 let velocity = 0;
 let maxVelocity = 0.01;
 
-const img = new Image;
-let ac: AudioContext;
-const canvas = document.querySelector('canvas') as HTMLCanvasElement;
+let ac : AudioContext;
 
-const statsElems = {
-  turns: document.querySelector('#turns')!,
-  velocity: document.querySelector('#velocity')!,
-  maxVelocity: document.querySelector('#maxVelocity')!
+const domElements = {
+  turns: document.getElementById('turns')!,
+  velocity: document.getElementById('velocity')!,
+  maxVelocity: document.getElementById('maxVelocity')!,
+  spinner: document.getElementById('spinner')!,
+  traceSlow: document.getElementById('trace-slow')!,
+  traceFast: document.getElementById('trace-fast')!
 };
-
-const imgDimensions = { width: 300, height: 300 };
-const dPR = window.devicePixelRatio;
-
-canvas.height = imgDimensions.height * dPR;
-canvas.width = imgDimensions.width * dPR;
-canvas.style.width = `${imgDimensions.width}px`;
-canvas.style.height = `${imgDimensions.height}px`;
-
-const ctx = canvas.getContext('2d')!;
-let drewImage = false;
-
-async function boot() {
-  return new Promise((res) => {
-    img.onload = function () {
-      res();
-    }
-
-    img.src = 'spinner.svg';
-  });
-}
 
 let fidgetAlpha = 0;
 let fidgetSpeed = 0;
 let turnCount = 0;
 
-function paint() {
-  canvas.style.transform = `translateX(-50%) translateY(-50%) rotate(${fidgetAlpha}rad)`;
-  if (!drewImage) {
-    ctx.drawImage(img, 0, 0, imgDimensions.width * dPR, imgDimensions.height * dPR);
-    drewImage = true;
-  }
-}
-
 function stats() {
-  velocity = Math.abs(fidgetSpeed * 60);
+  velocity = Math.abs(fidgetSpeed * 60 /* fps */ * 60 /* sec */) | 0;
   maxVelocity = Math.max(velocity, maxVelocity);
-  const velocityText = velocity.toLocaleString(undefined, { maximumFractionDigits: 1 });
   turnCount += Math.abs(fidgetSpeed / 2 / Math.PI);
   const turnsText = turnCount.toLocaleString(undefined, { maximumFractionDigits: 0 });
   const maxVelText = maxVelocity.toLocaleString(undefined, {maximumFractionDigits: 1});
 
-  statsElems.turns.textContent = `${turnsText}`;
-  statsElems.velocity.textContent = `${velocityText}`;
-  statsElems.maxVelocity.textContent = `${maxVelText}`;
+  domElements.turns.textContent = `${turnsText}`;
+  domElements.velocity.textContent = `${velocity}`;
+  domElements.maxVelocity.textContent = `${maxVelText}`;
 }
 
-const canvasPos = canvas.getBoundingClientRect()
-const centerX = canvasPos.left + canvasPos.width / 2;
-const centerY = canvasPos.top + canvasPos.height / 2;
-const centerRadius = canvasPos.width / 10;
+const spinnerPos = domElements.spinner.getBoundingClientRect();
+const centerX = spinnerPos.left + spinnerPos.width / 2;
+const centerY = spinnerPos.top + spinnerPos.height / 2;
+const centerRadius = spinnerPos.width / 10;
 
 //
 // Spin code
@@ -87,24 +58,24 @@ const touchInfo: {
 let touchSpeed = 0;
 let lastTouchAlpha = 0;
 
-function onTouchStart(e: TouchEvent | PointerEvent) {
-  let {x, y} = getXYFromTouchOrPointer(e);
-  onTouchMove(e);
-  touchInfo.down = true;
-  touchInfo.radius = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
-  lastTouchAlpha = touchInfo.alpha;
-}
-
 function getXYFromTouchOrPointer(e: TouchEvent | PointerEvent) {
   let x = 'touches' in e ? (e as TouchEvent).touches[0].clientX : (e as PointerEvent).clientX;
   let y = 'touches' in e ? (e as TouchEvent).touches[0].clientY : (e as PointerEvent).clientY;
 
-  return {x, y};
+  return {x: x - centerX, y: y - centerY};
+}
+
+function onTouchStart(e: TouchEvent | PointerEvent) {
+  let {x, y} = getXYFromTouchOrPointer(e);
+  onTouchMove(e);
+  touchInfo.down = true;
+  touchInfo.radius = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+  lastTouchAlpha = touchInfo.alpha;
 }
 
 function onTouchMove(e: TouchEvent | PointerEvent) {
   let {x, y} = getXYFromTouchOrPointer(e);
-  touchInfo.alpha = Math.atan2(x - centerX, y - centerY);
+  touchInfo.alpha = Math.atan2(x, y);
   e.preventDefault();
 }
 
@@ -123,34 +94,40 @@ function touchEnd() {
 
 function tick() {
   requestAnimationFrame(() => {
-    if (touchInfo.down && touchInfo.radius > centerRadius) {
-      touchSpeed = touchInfo.alpha - lastTouchAlpha;
-      if (touchSpeed < - Math.PI)
-        touchSpeed += 2 * Math.PI;
-      if (touchSpeed > Math.PI)
-        touchSpeed -= 2 * Math.PI;
+    if (touchInfo.down) {
+      if (touchInfo.radius > centerRadius) {
+        touchSpeed = touchInfo.alpha - lastTouchAlpha;
+        if (touchSpeed < - Math.PI)
+          touchSpeed += 2 * Math.PI;
+        if (touchSpeed > Math.PI)
+          touchSpeed -= 2 * Math.PI;
 
-      fidgetSpeed = touchSpeed;
-      lastTouchAlpha = touchInfo.alpha;
+        fidgetSpeed = touchSpeed;
+        lastTouchAlpha = touchInfo.alpha;
+      }
     } else if (touchSpeed) {
       fidgetSpeed = touchSpeed * touchInfo.radius / centerRadius;
       touchSpeed = 0;
     }
 
     fidgetAlpha -= fidgetSpeed;
-    paint();
+    domElements.spinner.style.transform =
+        `translateX(-50%) translateY(-50%) rotate(${fidgetAlpha}rad)`;
+    domElements.traceSlow.style.display = Math.abs(fidgetSpeed) > 0.1 ? 'block' : 'none';
+    domElements.traceFast.style.display = Math.abs(fidgetSpeed) > 0.2 ? 'block' : 'none';
     stats();
-    tick();
 
     // Slow down over time
     fidgetSpeed = fidgetSpeed * 0.99;
     fidgetSpeed = Math.sign(fidgetSpeed) * Math.max(0, (Math.abs(fidgetSpeed) - 2e-4));
 
-    const soundMagnitude = Math.abs(velocity / 2);
-    if (ac !== undefined && soundMagnitude) {
+    const soundMagnitude = Math.abs(velocity / 2 / 60);
+    if (ac && soundMagnitude) {
       spinSound(soundMagnitude);
       spinSound2(soundMagnitude);
     }
+
+    tick();
   });
 }
 
@@ -271,29 +248,28 @@ function spinSound2( magnitude: number ) {
 }
 
 (async () => {
-  await boot();
   tick();
   const listenFor = document.addEventListener as WhatWGAddEventListener;
 
   listenFor(
-    HAS_POINTER_EVENTS ? 'pointerdown' : 'touchstart',
+    USE_POINTER_EVENTS ? 'pointerdown' : 'touchstart',
     onTouchStart,
     {passive: false}
   );
 
   listenFor(
-    HAS_POINTER_EVENTS ? 'pointermove' : 'touchmove',
+    USE_POINTER_EVENTS ? 'pointermove' : 'touchmove',
     onTouchMove,
     {passive: false}
   );
 
   listenFor(
-    HAS_POINTER_EVENTS ? 'pointerup' : 'touchend',
+    USE_POINTER_EVENTS ? 'pointerup' : 'touchend',
     touchEnd,
   );
 
   listenFor(
-    HAS_POINTER_EVENTS ? 'pointercancel' : 'touchcancel',
+    USE_POINTER_EVENTS ? 'pointercancel' : 'touchcancel',
     touchEnd,
   );
 })();

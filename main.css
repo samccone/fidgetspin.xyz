@@ -23,12 +23,62 @@ body {
   overflow: hidden;
 }
 
-canvas {
+#spinner {
   position: absolute;
   top: 50%;
   left: 50%;
   -webkit-transform: translateY(-50%) translateX(-50%);
           transform: translateY(-50%) translateX(-50%);
+  width: 400px;
+  height: 400px;
+  will-change: transform;
+}
+
+#trace-slow, #trace-fast {
+  display: none;
+}
+
+#trace-slow img,
+#trace-fast img {
+  opacity: 0.1;
+}
+
+.spinner-trace-1 {
+  transform: rotate(5deg);
+}
+
+.spinner-trace-2 {
+  transform: rotate(8deg);
+}
+
+.spinner-trace-3 {
+  transform: rotate(12deg);
+}
+
+.spinner-trace-4 {
+  transform: rotate(20deg);
+}
+
+.spinner-trace-5 {
+  transform: rotate(-20deg);
+}
+
+.spinner-trace-6 {
+  transform: rotate(-12deg);
+}
+
+.spinner-trace-7 {
+  transform: rotate(-8deg);
+}
+
+.spinner-trace-8 {
+  transform: rotate(-5deg);
+}
+
+#spinner img {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 #footer {
