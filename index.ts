@@ -70,6 +70,7 @@ function stats() {
 const canvasPos = canvas.getBoundingClientRect()
 const centerX = canvasPos.left + canvasPos.width / 2;
 const centerY = canvasPos.top + canvasPos.height / 2;
+const centerRadius = canvasPos.width / 10;
 
 //
 // Spin code
@@ -77,17 +78,18 @@ const centerY = canvasPos.top + canvasPos.height / 2;
 
 const touchInfo: {
   alpha: number;
+  radius: number;
   down: boolean;
-} = { alpha: 0, down: false };
+} = { alpha: 0, radius: 0, down: false };
 
 let touchSpeed = 0;
 let lastTouchAlpha = 0;
 
 function onTouchStart(e: TouchEvent) {
-  touchInfo.alpha = Math.atan2(e.touches[0].clientX - centerX, e.touches[0].clientY - centerY);
-  lastTouchAlpha = touchInfo.alpha;
+  onTouchMove(e);
   touchInfo.down = true;
-  e.preventDefault();
+  touchInfo.radius = Math.sqrt(Math.pow(e.touches[0].clientX - centerX, 2) + Math.pow(e.touches[0].clientY - centerY, 2));
+  lastTouchAlpha = touchInfo.alpha;
 }
 
 function onTouchMove(e: TouchEvent) {
@@ -99,21 +101,22 @@ function touchEnd() {
   touchInfo.down = false;
 }
 
-const friction = 0.1;
-
 function tick() {
   requestAnimationFrame(() => {
-    if (touchInfo.down) {
-       touchSpeed = touchInfo.alpha - lastTouchAlpha;
-       if (touchSpeed < - Math.PI)
-         touchSpeed += 2 * Math.PI;
-       if (touchSpeed > Math.PI)
-         touchSpeed -= 2 * Math.PI;
-       // Apply friction
-       const boost = 1 + 10 * Math.min(1, Math.abs(fidgetSpeed));
-       fidgetSpeed = (1 - friction) * fidgetSpeed + friction * boost * touchSpeed;
-       lastTouchAlpha = touchInfo.alpha;
+    if (touchInfo.down && touchInfo.radius > centerRadius) {
+      touchSpeed = touchInfo.alpha - lastTouchAlpha;
+      if (touchSpeed < - Math.PI)
+        touchSpeed += 2 * Math.PI;
+      if (touchSpeed > Math.PI)
+        touchSpeed -= 2 * Math.PI;
+
+      fidgetSpeed = touchSpeed;
+      lastTouchAlpha = touchInfo.alpha;
+    } else if (touchSpeed) {
+      fidgetSpeed = touchSpeed * touchInfo.radius / centerRadius;
+      touchSpeed = 0;
     }
+
     fidgetAlpha -= fidgetSpeed;
     paint();
     stats();
