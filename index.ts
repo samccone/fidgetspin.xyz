@@ -11,7 +11,7 @@ let velocity = 0;
 let maxVelocity = 0.01;
 
 const img = new Image;
-const ac = new (typeof webkitAudioContext !== 'undefined' ? webkitAudioContext : AudioContext)();
+let ac:AudioContext;
 
 const canvas = document.querySelector('canvas') as HTMLCanvasElement;
 
@@ -86,6 +86,14 @@ let touchSpeed = 0;
 let lastTouchAlpha = 0;
 
 function onTouchStart(e: TouchEvent) {
+  if (!ac) {
+    ac = new (typeof webkitAudioContext !== 'undefined' ? webkitAudioContext : AudioContext)();
+    const tempOsc = ac.createOscillator();
+    const gain = ac.createGain();
+    tempOsc.connect(gain);
+    tempOsc.start(ac.currentTime);
+    tempOsc.stop(ac.currentTime + 1);
+  }
   onTouchMove(e);
   touchInfo.down = true;
   touchInfo.radius = Math.sqrt(Math.pow(e.touches[0].clientX - centerX, 2) + Math.pow(e.touches[0].clientY - centerY, 2));
@@ -103,16 +111,19 @@ function touchEnd() {
 
 function tick() {
   requestAnimationFrame(() => {
-    if (touchInfo.down && touchInfo.radius > centerRadius) {
-      touchSpeed = touchInfo.alpha - lastTouchAlpha;
-      if (touchSpeed < - Math.PI)
-        touchSpeed += 2 * Math.PI;
-      if (touchSpeed > Math.PI)
-        touchSpeed -= 2 * Math.PI;
+    if (touchInfo.down) {
+      if (touchInfo.radius > centerRadius) {
+        touchSpeed = touchInfo.alpha - lastTouchAlpha;
+        if (touchSpeed < - Math.PI)
+          touchSpeed += 2 * Math.PI;
+        if (touchSpeed > Math.PI)
+          touchSpeed -= 2 * Math.PI;
 
-      fidgetSpeed = touchSpeed;
-      lastTouchAlpha = touchInfo.alpha;
+        fidgetSpeed = touchSpeed;
+        lastTouchAlpha = touchInfo.alpha;
+      }
     } else if (touchSpeed) {
+      // on release
       fidgetSpeed = touchSpeed * touchInfo.radius / centerRadius;
       touchSpeed = 0;
     }
@@ -126,7 +137,7 @@ function tick() {
     fidgetSpeed = fidgetSpeed * 0.99;
     fidgetSpeed = Math.sign(fidgetSpeed) * Math.max(0, (Math.abs(fidgetSpeed) - 2e-4));
 
-    const soundMagnitude = Math.abs(velocity / 2);
+    const soundMagnitude = Math.abs(velocity / 5);
     if (soundMagnitude) {
       spinSound(soundMagnitude);
       spinSound2(soundMagnitude);
