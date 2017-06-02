@@ -17,6 +17,3 @@ type WhatWGAddEventListener = (
   listener: (event: Event) => void,
   options?: WhatWGAddEventListenerArgs
 ) => void;
-
-
-
