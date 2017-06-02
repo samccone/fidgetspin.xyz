@@ -7,6 +7,9 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+// thx https://github.com/Modernizr/Modernizr/blob/master/feature-detects/pointerevents.js
+const HAS_POINTER_EVENTS = 'onpointerdown' in document.createElement('div');
+
 let velocity = 0;
 let maxVelocity = 0.01;
 
@@ -84,15 +87,24 @@ const touchInfo: {
 let touchSpeed = 0;
 let lastTouchAlpha = 0;
 
-function onTouchStart(e: TouchEvent) {
+function onTouchStart(e: TouchEvent | PointerEvent) {
+  let {x, y} = getXYFromTouchOrPointer(e);
   onTouchMove(e);
   touchInfo.down = true;
-  touchInfo.radius = Math.sqrt(Math.pow(e.touches[0].clientX - centerX, 2) + Math.pow(e.touches[0].clientY - centerY, 2));
+  touchInfo.radius = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
   lastTouchAlpha = touchInfo.alpha;
 }
 
-function onTouchMove(e: TouchEvent) {
-  touchInfo.alpha = Math.atan2(e.touches[0].clientX - centerX, e.touches[0].clientY - centerY);
+function getXYFromTouchOrPointer(e: TouchEvent | PointerEvent) {
+  let x = 'touches' in e ? (e as TouchEvent).touches[0].clientX : (e as PointerEvent).clientX;
+  let y = 'touches' in e ? (e as TouchEvent).touches[0].clientY : (e as PointerEvent).clientY;
+
+  return {x, y};
+}
+
+function onTouchMove(e: TouchEvent | PointerEvent) {
+  let {x, y} = getXYFromTouchOrPointer(e);
+  touchInfo.alpha = Math.atan2(x - centerX, y - centerY);
   e.preventDefault();
 }
 
@@ -261,9 +273,27 @@ function spinSound2( magnitude: number ) {
 (async () => {
   await boot();
   tick();
+  const listenFor = document.addEventListener as WhatWGAddEventListener;
 
-  (document.addEventListener as WhatWGAddEventListener)('touchstart', onTouchStart, {passive: false});
-  (document.addEventListener as WhatWGAddEventListener)('touchmove', onTouchMove, {passive: false});
-  (document.addEventListener as WhatWGAddEventListener)('touchend', touchEnd);
-  (document.addEventListener as WhatWGAddEventListener)('touchcancel', touchEnd);
+  listenFor(
+    HAS_POINTER_EVENTS ? 'pointerdown' : 'touchstart',
+    onTouchStart,
+    {passive: false}
+  );
+
+  listenFor(
+    HAS_POINTER_EVENTS ? 'pointermove' : 'touchmove',
+    onTouchMove,
+    {passive: false}
+  );
+
+  listenFor(
+    HAS_POINTER_EVENTS ? 'pointerup' : 'touchend',
+    touchEnd,
+  );
+
+  listenFor(
+    HAS_POINTER_EVENTS ? 'pointercancel' : 'touchcancel',
+    touchEnd,
+  );
 })();
