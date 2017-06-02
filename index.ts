@@ -11,8 +11,7 @@ let velocity = 0;
 let maxVelocity = 0.01;
 
 const img = new Image;
-const ac = new (typeof webkitAudioContext !== 'undefined' ? webkitAudioContext : AudioContext)();
-
+let ac: AudioContext;
 const canvas = document.querySelector('canvas') as HTMLCanvasElement;
 
 const statsElems = {
@@ -99,6 +98,15 @@ function onTouchMove(e: TouchEvent) {
 
 function touchEnd() {
   touchInfo.down = false;
+
+  // http://www.holovaty.com/writing/ios9-web-audio/
+  if (ac === undefined) {
+    ac = new (typeof webkitAudioContext !== 'undefined' ? webkitAudioContext : AudioContext)();
+    const osc  = ac.createOscillator();
+    osc.connect(ac.destination);
+    osc.start(ac.currentTime);
+    osc.stop(ac.currentTime + 0.00000001);
+  }
 }
 
 function tick() {
@@ -127,7 +135,7 @@ function tick() {
     fidgetSpeed = Math.sign(fidgetSpeed) * Math.max(0, (Math.abs(fidgetSpeed) - 2e-4));
 
     const soundMagnitude = Math.abs(velocity / 2);
-    if (soundMagnitude) {
+    if (ac !== undefined && soundMagnitude) {
       spinSound(soundMagnitude);
       spinSound2(soundMagnitude);
     }
@@ -249,23 +257,6 @@ function spinSound2( magnitude: number ) {
   osc.start(ac.currentTime);
   osc.stop(endPlayTime2);
 }
-
-
-interface WhatWGEventListenerArgs {
-  capture?: boolean;
-}
-
-interface WhatWGAddEventListenerArgs extends WhatWGEventListenerArgs {
-  passive?: boolean;
-  once?: boolean;
-}
-
-type WhatWGAddEventListener = (
-  type: string,
-  listener: (event: Event) => void,
-  options?: WhatWGAddEventListenerArgs
-) => void;
-
 
 (async () => {
   await boot();
