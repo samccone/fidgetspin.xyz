@@ -81,15 +81,6 @@ function onTouchMove(e: TouchEvent | PointerEvent) {
 
 function touchEnd() {
   touchInfo.down = false;
-
-  // http://www.holovaty.com/writing/ios9-web-audio/
-  if (ac === undefined) {
-    ac = new (typeof webkitAudioContext !== 'undefined' ? webkitAudioContext : AudioContext)();
-    const osc  = ac.createOscillator();
-    osc.connect(ac.destination);
-    osc.start(ac.currentTime);
-    osc.stop(ac.currentTime + 0.00000001);
-  }
 }
 
 function tick() {
@@ -247,7 +238,38 @@ function spinSound2( magnitude: number ) {
   osc.stop(endPlayTime2);
 }
 
+// Audio on IOS is very hard.
+// http://www.holovaty.com/writing/ios9-web-audio/
+// https://github.com/goldfire/howler.js/blob/8612912af28d6fb9f442c4f5a02827155bcf3464/src/howler.core.js#L278
+function unlockAudio() {
+  function unlock() {
+    ac = new (typeof webkitAudioContext !== 'undefined' ? webkitAudioContext : AudioContext)();
+    // Create an empty buffer.
+    const source = ac.createBufferSource();
+    source.buffer = ac.createBuffer(1, 1, 22050);;
+    source.connect(ac.destination);
+
+    // Play the empty buffer.
+    if (typeof source.start === 'undefined') {
+      (source as any).noteOn(0);
+    } else {
+      source.start(0);
+    }
+
+    // Setup a timeout to check that we are unlocked on the next event loop.
+    source.onended = function() {
+      source.disconnect(0);
+
+      // Remove the touch start listener.
+      document.removeEventListener('touchend', unlock, true);
+    };
+  }
+
+  document.addEventListener('touchend', unlock, true);
+}
+
 (async () => {
+  unlockAudio();
   tick();
   const listenFor = document.addEventListener as WhatWGAddEventListener;
 
