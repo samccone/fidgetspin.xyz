@@ -11,14 +11,15 @@ if ('serviceWorker' in navigator) {
 const USE_POINTER_EVENTS = 'onpointerdown' in document.createElement('div') ;
 
 let velocity = 0;
-let maxVelocity = 0.01;
 
 const ac = new (typeof webkitAudioContext !== 'undefined' ? webkitAudioContext : AudioContext)();
 const masterVolume = ac.createGain();
 masterVolume.connect(ac.destination);
 
 const appState = {
-  muted: localStorage.getItem('fidget_muted') === 'true' ? true : false
+  muted: localStorage.getItem('fidget_muted') === 'true' ? true : false,
+  spins: localStorage.getItem('fidget_spins') ? parseInt(localStorage.getItem('fidget_spins')!, 10) : 0,
+  maxVelocity: localStorage.getItem('fidget_max_velocity') ? parseInt(localStorage.getItem('fidget_max_velocity')!, 10) : 0
 };
 
 
@@ -34,14 +35,30 @@ const domElements = {
 
 let fidgetAlpha = 0;
 let fidgetSpeed = 0;
-let turnCount = 0;
+
+function deferWork(fn: () => void) {
+  if (typeof requestIdleCallback as any !== 'undefined') {
+    requestIdleCallback(fn, {timeout: 60});
+  } else if (typeof requestAnimationFrame !== 'undefined') {
+    requestAnimationFrame(fn);
+  } else {
+    setTimeout(fn, 16.66);
+  }
+}
 
 function stats() {
   velocity = Math.abs(fidgetSpeed * 60 /* fps */ * 60 /* sec */ / 2 / Math.PI) | 0;
-  maxVelocity = Math.max(velocity, maxVelocity);
-  turnCount += Math.abs(fidgetSpeed / 2 / Math.PI);
-  const turnsText = turnCount.toLocaleString(undefined, { maximumFractionDigits: 0 });
-  const maxVelText = maxVelocity.toLocaleString(undefined, {maximumFractionDigits: 1});
+  const newMaxVelocity =  Math.max(velocity, appState.maxVelocity);
+
+  if (appState.maxVelocity !== newMaxVelocity) {
+    deferWork(() => localStorage.setItem('fidget_max_velocity', `${appState.maxVelocity}`));
+    appState.maxVelocity = newMaxVelocity;
+  }
+
+  appState.spins += Math.abs(fidgetSpeed / 2 / Math.PI);
+  deferWork(() => localStorage.setItem('fidget_spins', `${appState.spins}`));
+  const turnsText = appState.spins.toLocaleString(undefined, { maximumFractionDigits: 0 });
+  const maxVelText = appState.maxVelocity.toLocaleString(undefined, {maximumFractionDigits: 1});
 
   domElements.turns.textContent = `${turnsText}`;
   domElements.velocity.textContent = `${velocity}`;
