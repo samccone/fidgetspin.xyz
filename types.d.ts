@@ -3,6 +3,10 @@ declare const webkitAudioContext: {
   new (): AudioContext;
 }
 
+declare const requestIdleCallback: {
+  (fn: () => void, opts?: {timeout?: number}): void;
+}
+
 interface WhatWGEventListenerArgs {
   capture?: boolean;
 }
