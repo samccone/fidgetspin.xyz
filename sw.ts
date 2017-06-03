@@ -6,7 +6,7 @@ interface ExtendableEvent {
   request: any;
 }
 
-var VERSION = '8';
+var VERSION = '9';
 
 this.addEventListener('install', (e: ExtendableEvent) => e.waitUntil(swInstall()));
 this.addEventListener('activate', (e: ExtendableEvent) => e.waitUntil(swActivate()));
