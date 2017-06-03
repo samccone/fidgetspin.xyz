@@ -14,6 +14,13 @@ let velocity = 0;
 let maxVelocity = 0.01;
 
 const ac = new (typeof webkitAudioContext !== 'undefined' ? webkitAudioContext : AudioContext)();
+const masterVolume = ac.createGain();
+masterVolume.connect(ac.destination);
+
+const appState = {
+  muted: localStorage.getItem('fidget_muted') === 'true' ? true : false
+};
+
 
 const domElements = {
   turns: document.getElementById('turns')!,
@@ -21,7 +28,8 @@ const domElements = {
   maxVelocity: document.getElementById('maxVelocity')!,
   spinner: document.getElementById('spinner')!,
   traceSlow: document.getElementById('trace-slow')!,
-  traceFast: document.getElementById('trace-fast')!
+  traceFast: document.getElementById('trace-fast')!,
+  toggleAudio: document.getElementById('toggle-audio')!
 };
 
 let fidgetAlpha = 0;
@@ -178,7 +186,7 @@ function spinSound( magnitude: number ) {
 
   osc.type = 'triangle';
   osc.connect( gain );
-  gain.connect( ac.destination );
+  gain.connect(masterVolume);
 
   // max of 40 boops
   //const count = 6 + ( 1 * magnitude );
@@ -221,7 +229,7 @@ function spinSound2( magnitude: number ) {
 
   osc.type = 'sine';
   osc.connect( gain );
-  gain.connect( ac.destination );
+  gain.connect(masterVolume);
 
   var freq = freqRange300_1500(freqMagnitude);
   // boop duration (longer for lower magnitude)
@@ -267,10 +275,29 @@ function unlockAudio() {
   document.addEventListener('touchend', unlock, true);
 }
 
+function setMutedSideEffects(muted: boolean) {
+  domElements.toggleAudio.classList.toggle('muted', muted);
+  masterVolume.gain.setValueAtTime(appState.muted ? 0 : 1, ac.currentTime);
+  localStorage.setItem('fidget_muted', `${appState.muted}`);
+}
+
+function toggleAudio(e: Event) {
+  appState.muted = !appState.muted;
+  setMutedSideEffects(appState.muted);
+
+  // if something is spinning, we do not want to stop it if you touch the menu.
+  e.stopPropagation();
+}
+
 (async () => {
+  setMutedSideEffects(appState.muted);
   unlockAudio();
   tick();
   const listenFor = document.addEventListener as WhatWGAddEventListener;
+
+  domElements.toggleAudio.addEventListener(
+    USE_POINTER_EVENTS ? 'pointerdown' : 'touchstart',
+    toggleAudio);
 
   listenFor(
     USE_POINTER_EVENTS ? 'pointerdown' : 'touchstart',
