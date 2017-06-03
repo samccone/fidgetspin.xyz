@@ -28,7 +28,7 @@ body {
 
 #trace-slow,
 #trace-fast {
-  display: none;
+  opacity: 0.000001;
 }
 
 #trace-slow img,
@@ -72,6 +72,7 @@ body {
   position: absolute;
   top: 0;
   left: 0;
+  will-change: transform;
 }
 
 #footer {

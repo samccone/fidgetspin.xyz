@@ -113,8 +113,8 @@ function tick() {
     fidgetAlpha -= fidgetSpeed;
     domElements.spinner.style.transform =
         `translateX(-50%) translateY(-50%) rotate(${fidgetAlpha}rad)`;
-    domElements.traceSlow.style.display = Math.abs(fidgetSpeed) > 0.1 ? 'block' : 'none';
-    domElements.traceFast.style.display = Math.abs(fidgetSpeed) > 0.2 ? 'block' : 'none';
+    domElements.traceSlow.style.opacity = Math.abs(fidgetSpeed) > 0.2 ? '1' : '0.00001';
+    domElements.traceFast.style.opacity = Math.abs(fidgetSpeed) > 0.4 ? '1' : '0.00001';
     stats();
 
     // Slow down over time
