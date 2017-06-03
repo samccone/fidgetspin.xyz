@@ -8,7 +8,7 @@ if ('serviceWorker' in navigator) {
 }
 
 // thx https://github.com/Modernizr/Modernizr/blob/master/feature-detects/pointerevents.js
-const USE_POINTER_EVENTS = !('ontouchstart' in (window as any)['__proto__']);
+const USE_POINTER_EVENTS = 'onpointerdown' in document.createElement('div') ;
 
 let velocity = 0;
 let maxVelocity = 0.01;
