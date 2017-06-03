@@ -13,7 +13,7 @@ const USE_POINTER_EVENTS = 'onpointerdown' in document.createElement('div') ;
 let velocity = 0;
 let maxVelocity = 0.01;
 
-let ac : AudioContext;
+const ac = new (typeof webkitAudioContext !== 'undefined' ? webkitAudioContext : AudioContext)();
 
 const domElements = {
   turns: document.getElementById('turns')!,
@@ -113,7 +113,7 @@ function tick() {
     fidgetSpeed = Math.sign(fidgetSpeed) * Math.max(0, (Math.abs(fidgetSpeed) - 2e-4));
 
     const soundMagnitude = Math.abs(velocity * Math.PI / 60);
-    if (ac && soundMagnitude) {
+    if (soundMagnitude) {
       spinSound(soundMagnitude);
       spinSound2(soundMagnitude);
     }
@@ -243,7 +243,6 @@ function spinSound2( magnitude: number ) {
 // https://github.com/goldfire/howler.js/blob/8612912af28d6fb9f442c4f5a02827155bcf3464/src/howler.core.js#L278
 function unlockAudio() {
   function unlock() {
-    ac = new (typeof webkitAudioContext !== 'undefined' ? webkitAudioContext : AudioContext)();
     // Create an empty buffer.
     const source = ac.createBufferSource();
     source.buffer = ac.createBuffer(1, 1, 22050);;
