@@ -17,6 +17,8 @@ const masterVolume = ac.createGain();
 masterVolume.connect(ac.destination);
 
 const appState = {
+  pickerOpen: false,
+  spinner: 'base',
   muted: localStorage.getItem('fidget_muted') === 'true' ? true : false,
   spins: localStorage.getItem('fidget_spins') ? parseInt(localStorage.getItem('fidget_spins')!, 10) : 0,
   maxVelocity: localStorage.getItem('fidget_max_velocity') ? parseInt(localStorage.getItem('fidget_max_velocity')!, 10) : 0
@@ -30,7 +32,10 @@ const domElements = {
   spinner: document.getElementById('spinner')!,
   traceSlow: document.getElementById('trace-slow')!,
   traceFast: document.getElementById('trace-fast')!,
-  toggleAudio: document.getElementById('toggle-audio')!
+  toggleAudio: document.getElementById('toggle-audio')!,
+  spinners: Array.from(document.getElementsByClassName('spinner')!) as HTMLImageElement[],
+  pickerToggle: document.getElementById('picker')!,
+  pickerPane: document.getElementById('spinner-picker')!
 };
 
 let fidgetAlpha = 0;
@@ -91,6 +96,10 @@ function getXYFromTouchOrPointer(e: TouchEvent | PointerEvent) {
 }
 
 function onTouchStart(e: TouchEvent | PointerEvent) {
+  if (appState.pickerOpen) {
+    return;
+  }
+
   let {x, y} = getXYFromTouchOrPointer(e);
   onTouchMove(e);
   touchInfo.down = true;
@@ -99,12 +108,20 @@ function onTouchStart(e: TouchEvent | PointerEvent) {
 }
 
 function onTouchMove(e: TouchEvent | PointerEvent) {
+  if (appState.pickerOpen) {
+    return;
+  }
+
   let {x, y} = getXYFromTouchOrPointer(e);
   touchInfo.alpha = Math.atan2(x, y);
   e.preventDefault();
 }
 
 function touchEnd() {
+  if (appState.pickerOpen) {
+    return;
+  }
+
   touchInfo.down = false;
 }
 
@@ -297,6 +314,11 @@ function setMutedSideEffects(muted: boolean) {
   localStorage.setItem('fidget_muted', `${appState.muted}`);
 }
 
+function togglePicker() {
+  appState.pickerOpen = !appState.pickerOpen;
+  domElements.pickerPane.classList.toggle('hidden', !appState.pickerOpen);
+}
+
 function toggleAudio(e: Event) {
   appState.muted = !appState.muted;
   setMutedSideEffects(appState.muted);
@@ -305,11 +327,30 @@ function toggleAudio(e: Event) {
   e.stopPropagation();
 }
 
+function changeSpinner(src: string) {
+  for (let s of domElements.spinners) {
+    s.src = src;
+  }
+}
+
+function pickSpinner(e: Event) {
+  if ((e.target as HTMLElement).tagName === 'IMG') {
+    changeSpinner((e.target as HTMLImageElement).src);
+    togglePicker();
+  }
+}
+
 (async () => {
   setMutedSideEffects(appState.muted);
   unlockAudio();
   tick();
   const listenFor = document.addEventListener as WhatWGAddEventListener;
+
+  domElements.pickerToggle.addEventListener(
+    USE_POINTER_EVENTS ? 'pointerdown' : 'touchstart',
+    togglePicker);
+
+  domElements.pickerPane.addEventListener('click', pickSpinner);
 
   domElements.toggleAudio.addEventListener(
     USE_POINTER_EVENTS ? 'pointerdown' : 'touchstart',

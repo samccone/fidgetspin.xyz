@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="./main.css">
     <meta name="theme-color" content="#ffffff">
     <link rel="preload" as="script" href="./index.js">
-    <link rel="preload" as="image" href="./spinner.png">
+    <link rel="preload" as="image" href="./assests/spinners/base.png">
     <link rel="preload" as="image" href="./assets/mute.svg">
     <link rel="preload" as="image" href="./assets/volume.svg">
     <link rel="manifest" href="./manifest.json">
@@ -37,23 +37,32 @@
         </div>
       </div>
     </div>
+
+    <ul class="hidden" id="spinner-picker">
+      <li><img src="./assets/spinners/base.png"></li>
+      <li><img src="./assets/spinners/triple.png"></li>
+      <li><img src="./assets/spinners/pokeball.png"></li>
+    </ul>
+
     <div id='spinner-container'>
       <div id='spinner'>
-        <img alt="primary spinner" src='spinner.png'>
+        <img alt="primary spinner" class="spinner" src='./assets/spinners/base.png'>
         <div id='trace-slow'>
-          <img alt="spinner" class='spinner-trace-1' src='spinner.png'>
-          <img alt="spinner" class='spinner-trace-2' src='spinner.png'>
-          <img alt="spinner" class='spinner-trace-5' src='spinner.png'>
-          <img alt="spinner" class='spinner-trace-6' src='spinner.png'>
+          <img alt="spinner" class='spinner spinner-trace-1' src='./assets/spinners/base.png'>
+          <img alt="spinner" class='spinner spinner-trace-2' src='./assets/spinners/base.png'>
+          <img alt="spinner" class='spinner spinner-trace-5' src='./assets/spinners/base.png'>
+          <img alt="spinner" class='spinner spinner-trace-6' src='./assets/spinners/base.png'>
         </div>
         <div id='trace-fast'>
-          <img alt="spinner" class='spinner-trace-3' src='spinner.png'>
-          <img alt="spinner" class='spinner-trace-4' src='spinner.png'>
-          <img alt="spinner" class='spinner-trace-7' src='spinner.png'>
-          <img alt="spinner" class='spinner-trace-8' src='spinner.png'>
+          <img alt="spinner" class='spinner spinner-trace-3' src='./assets/spinners/base.png'>
+          <img alt="spinner" class='spinner spinner-trace-4' src='./assets/spinners/base.png'>
+          <img alt="spinner" class='spinner spinner-trace-7' src='./assets/spinners/base.png'>
+          <img alt="spinner" class='spinner spinner-trace-8' src='./assets/spinners/base.png'>
         </div>
       </div>
     </div>
+
+
     <div id="footer">
       <div class="menu">
         <div class="menu-item" id="toggle-audio"></div>
