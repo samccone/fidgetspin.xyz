@@ -18,6 +18,6 @@ env:
 deploy:
   provider: pages # gh-pages
   skip_cleanup: true
-  github_token: $GITHUB_TOKEN
+  github_token: $GH_TOKEN
   on:
     branch: master
