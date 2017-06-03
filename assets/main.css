@@ -139,23 +139,20 @@ body {
   color: #989898;
 }
 
+.max-velocity {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .max-velocity-unit {
   display: inline-block;
-  font-size: 24px;
-  margin-right: 10px;
+  font-size: 12px;
 }
 
 #maxVelocity {
   font-size: 42px;
   display: inline-block;
-  text-align: left;
-}
-
-.max-velocity {
-  display: flex;
-  display: -webkit-flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .spin-icon {
@@ -214,4 +211,34 @@ body {
 
 .turns div {
   display: inline-block;
+}
+
+.menu {
+  height: 40px;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row-reverse;
+}
+
+#toggle-audio{
+  background-image: url(/assets/volume.svg);
+}
+
+#toggle-audio.muted {
+  background-image: url(/assets/mute.svg);
+}
+
+#picker {
+  background-image: url(/assets/picker.svg);
+}
+
+.menu-item {
+  height: 100%;
+  width: 40px;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+#picker {
+  opacity: 0;
 }

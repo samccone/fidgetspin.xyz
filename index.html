@@ -10,6 +10,8 @@
     <meta name="theme-color" content="#ffffff">
     <link rel="preload" as="script" href="./index.js">
     <link rel="preload" as="image" href="./spinner.png">
+    <link rel="preload" as="image" href="./assets/mute.svg">
+    <link rel="preload" as="image" href="./assets/volume.svg">
     <link rel="manifest" href="./manifest.json">
   </head>
   <body>
@@ -50,9 +52,13 @@
       </div>
     </div>
     <div id="footer">
-      <div class="max-velocity">
-        <div class="max-velocity-unit">Top Speed: </div>
-        <div id="maxVelocity">0</div>
+      <div class="menu">
+        <div class="menu-item" id="toggle-audio"></div>
+        <div class="max-velocity">
+          <div class="max-velocity-unit">MAX RPM</div>
+          <div id="maxVelocity">0</div>
+        </div>
+        <div class="menu-item" id="picker"></div>
       </div>
     </div>
     <script src="./index.js"></script>
