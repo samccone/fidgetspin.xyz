@@ -9,7 +9,7 @@ before_script:
 - git config --global user.name "TRAVIS-CI"
 script:
 - yarn run build
-- rm .gitignore
+- echo "node_modules" > .gitignore
 env:
   global:
   - secure: I4B4225tRne/Bjrr9Jw2MNipifpxf0EVu4S0VEWMmNC/H2rsW8jFFhzKGShDjD9XA4OBu8NSuT/V5X744Soc0EfsAuwt4dkgIZeewzdG0x10QVniYta929z/siDNQrvOy2HdHcnX4W+E0Eya9U0Qb5eR1iCCtLYYnb7eFFdBZdfFcC7Osjv4vPaTLWNOfeosWuzvoocwfl0U3AglP1Ot2g74HpzPeo0INaEUmk07NwqMqjArGxmR+onO6T0fKSNbh+6DTIVguYNZect8tTktJtq2rEhnX9nuw8zAqjvSIWMvvXbiZSbsIcTttyH66uJTtVDyKicIaanVEEmWGjjCN6siPFhU7bVyUuQnVJT9vC0ec/bHmua8cjpB1kA5NBysp7mPLQhHEf9XsLwXFoIAgPAalFjU4+dlwdcUfv1l2GKdBTIRYH3+ymna4Bc0UD6cCamnfr/1koPQgpvn9OTf+gRopgg6G+joIjbKxT4lL/8P/hhGqm6OshVXqLvVeNpM5SUFyZVzVy/yUTiMwVdwFVuIyxJMeCjxn8PJQkI5RmELFaQnlPV4j9b2eS2y59Thp4jtxK5lzixYaEC7r9g/26IJdAl5IDA7hWhPIzaf76vObYDqcLA+eZEKOSsJqC1KtRgBco/JohNvsNUZL5HqbwJmYToCbNw7EglXdUFkl0M=
