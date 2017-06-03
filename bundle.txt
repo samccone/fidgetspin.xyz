@@ -6,5 +6,5 @@
 ./index.html
 ./index.js
 ./main.css
-./spinner.svg
+./spinner.png
 ./sw.js
