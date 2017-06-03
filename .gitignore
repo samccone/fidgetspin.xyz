@@ -1,5 +1,5 @@
 node_modules
 .DS_STORE
-main.css
-index.js
-sw.js
+/main.css
+/index.js
+/sw.js
