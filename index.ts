@@ -29,7 +29,7 @@ let fidgetSpeed = 0;
 let turnCount = 0;
 
 function stats() {
-  velocity = Math.abs(fidgetSpeed * 60 /* fps */ * 60 /* sec */) | 0;
+  velocity = Math.abs(fidgetSpeed * 60 /* fps */ * 60 /* sec */ / 2 / Math.PI) | 0;
   maxVelocity = Math.max(velocity, maxVelocity);
   turnCount += Math.abs(fidgetSpeed / 2 / Math.PI);
   const turnsText = turnCount.toLocaleString(undefined, { maximumFractionDigits: 0 });
@@ -121,7 +121,7 @@ function tick() {
     fidgetSpeed = fidgetSpeed * 0.99;
     fidgetSpeed = Math.sign(fidgetSpeed) * Math.max(0, (Math.abs(fidgetSpeed) - 2e-4));
 
-    const soundMagnitude = Math.abs(velocity / 2 / 60);
+    const soundMagnitude = Math.abs(velocity * Math.PI / 60);
     if (ac && soundMagnitude) {
       spinSound(soundMagnitude);
       spinSound2(soundMagnitude);
