@@ -138,7 +138,7 @@ function tick() {
     fidgetSpeed = Math.sign(fidgetSpeed) * Math.max(0, (Math.abs(fidgetSpeed) - 2e-4));
 
     const soundMagnitude = Math.abs(velocity * Math.PI / 60);
-    if (soundMagnitude) {
+    if (soundMagnitude && !touchInfo.down) {
       spinSound(soundMagnitude);
       spinSound2(soundMagnitude);
     }
