@@ -6,7 +6,9 @@
     "start": "http-server",
     "now-start": "http-server -p 80"
   },
-
+  "browserslist": [
+     "> 5%"
+  ],
   "dependencies": {
     "typescript": "^2.3.3"
   },
