@@ -14,6 +14,7 @@ Play it live [fidgetspin.xyz](https://www.fidgetspin.xyz)
 yarn build # builds once
 
 yarn watch # does typescript autorecompile
+yarn watch-css # does autoprefixer autorecompile
 
 yarn start # starts static server on 80
 
