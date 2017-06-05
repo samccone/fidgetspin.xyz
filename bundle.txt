@@ -6,5 +6,7 @@
 ./index.html
 ./index.js
 ./main.css
-./spinner.png
+./assets/spinners/base.png
+./assets/spinners/triple.png
+./assets/spinners/pokeball.png
 ./sw.js

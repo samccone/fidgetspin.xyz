@@ -16,6 +16,37 @@ body {
   touch-action: none;
 }
 
+#spinner-picker.hidden {
+  display: none;
+}
+
+#spinner-picker {
+  background: hsla(0, 0%, 92%, 0.95);
+  width: 100%;
+  display: flex;
+  justify-content: start;
+  flex-direction: column;
+  align-items: center;
+  overflow: scroll;
+  position: absolute;
+  top: 0;
+  z-index: 1;
+  left: 0;
+  padding: 20px;
+  margin: 0;
+  height: calc(100% - 80px);
+}
+
+#spinner-picker li {
+  display: block;
+}
+
+#spinner-picker li img {
+  max-width: 240px;
+  width: 100%;
+  margin-bottom: -20px;
+}
+
 #spinner-container {
   position: absolute;
   top: 50%;
@@ -100,6 +131,7 @@ body {
   border-radius: 0;
   left: 0;
   bottom: 0;
+  z-index: 2;
 }
 
 .speed {
@@ -242,8 +274,4 @@ body {
   width: 40px;
   background-size: contain;
   background-repeat: no-repeat;
-}
-
-#picker {
-  opacity: 0;
 }
