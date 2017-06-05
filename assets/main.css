@@ -21,20 +21,20 @@ body {
 }
 
 #spinner-picker {
-  background: #fff;
+  background: hsla(0, 0%, 92%, 0.95);
   width: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: start;
   flex-direction: column;
+  align-items: center;
   overflow: scroll;
   position: absolute;
   top: 0;
   z-index: 1;
   left: 0;
-  padding: 0;
+  padding: 20px;
   margin: 0;
   height: calc(100% - 80px);
-  flex-flow: row wrap;
 }
 
 #spinner-picker li {
@@ -42,8 +42,9 @@ body {
 }
 
 #spinner-picker li img {
-  max-width: 400px;
+  max-width: 240px;
   width: 100%;
+  margin-bottom: -20px;
 }
 
 #spinner-container {
