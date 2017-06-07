@@ -49,6 +49,11 @@ const spinners = [
     name: 'The \'Chu',
     unlockedAt: 1000
   },
+  {
+    path: './assets/spinners/cube.png',
+    name: 'The Cubist',
+    unlockedAt: 1500
+  },
 ];
 
 
