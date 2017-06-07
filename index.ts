@@ -327,7 +327,7 @@ function togglePicker() {
   if (appState.pickerOpen !== true) {
     appState.pickerOpen = !appState.pickerOpen;
     history.pushState(appState, '', '#picker');
-    domElements.pickerPane.classList.remove('hidden');
+    showPicker();
   } else {
     history.back();
   }
@@ -352,6 +352,11 @@ function pickSpinner(e: Event) {
     changeSpinner((e.target as HTMLImageElement).src);
     togglePicker();
   }
+}
+
+function showPicker() {
+  domElements.pickerPane.classList.remove('hidden');
+  domElements.pickerPane.scrollTop = 0;
 }
 
 (async () => {
@@ -403,7 +408,7 @@ function pickSpinner(e: Event) {
     // Assume if state is set here picker is going to need to open.
     } else if (e.state !== null) {
       appState.pickerOpen = true;
-      domElements.pickerPane.classList.remove('hidden');
+      showPicker();
     }
   }
 })();
