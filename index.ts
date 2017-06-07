@@ -42,17 +42,17 @@ const spinners = [
   {
     path: './assets/spinners/triple.png',
     name: 'The Triple',
-    unlockedAt: 400
+    unlockedAt: 500
   },
   {
     path: './assets/spinners/pokeball.png',
     name: 'The \'Chu',
-    unlockedAt: 1000
+    unlockedAt: 2000
   },
   {
     path: './assets/spinners/cube.png',
     name: 'The Cubist',
-    unlockedAt: 1500
+    unlockedAt: 5000
   },
 ];
 
