@@ -8,7 +8,7 @@ before_script:
 - git config --global user.email "travis@fidgetspin.xyz"
 - git config --global user.name "TRAVIS-CI"
 script:
-- yarn run build
+- yarn run build-css
 - yarn run build-dist-js
 - echo "node_modules" > .gitignore
 env:
