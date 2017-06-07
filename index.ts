@@ -19,9 +19,9 @@ masterVolume.connect(ac.destination);
 const appState = {
   pickerOpen: false,
   spinner: 'base',
-  muted: localStorage.getItem('fidget_muted') === 'true' ? true : false,
-  spins: localStorage.getItem('fidget_spins') ? parseInt(localStorage.getItem('fidget_spins')!, 10) : 0,
-  maxVelocity: localStorage.getItem('fidget_max_velocity') ? parseInt(localStorage.getItem('fidget_max_velocity')!, 10) : 0
+  muted: window.localStorage.getItem('fidget_muted') === 'true' ? true : false,
+  spins: window.localStorage.getItem('fidget_spins') ? parseInt(window.localStorage.getItem('fidget_spins')!, 10) : 0,
+  maxVelocity: window.localStorage.getItem('fidget_max_velocity') ? parseInt(window.localStorage.getItem('fidget_max_velocity')!, 10) : 0
 };
 
 
@@ -56,12 +56,12 @@ function stats() {
   const newMaxVelocity =  Math.max(velocity, appState.maxVelocity);
 
   if (appState.maxVelocity !== newMaxVelocity) {
-    deferWork(() => localStorage.setItem('fidget_max_velocity', `${appState.maxVelocity}`));
+    deferWork(() => window.localStorage.setItem('fidget_max_velocity', `${appState.maxVelocity}`));
     appState.maxVelocity = newMaxVelocity;
   }
 
   appState.spins += Math.abs(fidgetSpeed / 2 / Math.PI);
-  deferWork(() => localStorage.setItem('fidget_spins', `${appState.spins}`));
+  deferWork(() => window.localStorage.setItem('fidget_spins', `${appState.spins}`));
   const turnsText = appState.spins.toLocaleString(undefined, { maximumFractionDigits: 0 });
   const maxVelText = appState.maxVelocity.toLocaleString(undefined, {maximumFractionDigits: 1});
 
@@ -311,7 +311,7 @@ function unlockAudio() {
 function setMutedSideEffects(muted: boolean) {
   domElements.toggleAudio.classList.toggle('muted', muted);
   masterVolume.gain.setValueAtTime(appState.muted ? 0 : 1, ac.currentTime);
-  localStorage.setItem('fidget_muted', `${appState.muted}`);
+  window.localStorage.setItem('fidget_muted', `${appState.muted}`);
 }
 
 function togglePicker() {
