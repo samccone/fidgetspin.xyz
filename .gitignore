@@ -4,3 +4,4 @@ node_modules
 /index.js
 externs.js
 tmp.js
+disabled_sw.js
