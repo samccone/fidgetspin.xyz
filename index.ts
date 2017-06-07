@@ -33,6 +33,24 @@ const appState = {
   maxVelocity: window.localStorage.getItem('fidget_max_velocity') ? parseInt(window.localStorage.getItem('fidget_max_velocity')!, 10) : 0
 };
 
+const spinners = [
+  {
+    path: './assets/spinners/base.png',
+    name: 'The Classic',
+    unlockedAt: 0
+  },
+  {
+    path: './assets/spinners/triple.png',
+    name: 'The Triple',
+    unlockedAt: 400
+  },
+  {
+    path: './assets/spinners/pokeball.png',
+    name: 'The \'Chu',
+    unlockedAt: 1000
+  },
+];
+
 
 const domElements = {
   turns: document.getElementById('turns')!,
@@ -351,13 +369,30 @@ function changeSpinner(src: string) {
 }
 
 function pickSpinner(e: Event) {
-  if ((e.target as HTMLElement).tagName === 'IMG') {
+  const target = e.target as HTMLElement;
+  if (target.tagName === 'IMG' && !target.classList.contains('locked')) {
     changeSpinner((e.target as HTMLImageElement).src);
     togglePicker();
   }
 }
 
 function showPicker() {
+  domElements.pickerPane.innerHTML = '';
+  let toAppend = '';
+
+  for (let spinner of spinners) {
+      toAppend += `<li><p class="title">${spinner.name}</p>`;
+
+      if (spinner.unlockedAt > appState.spins) {
+        toAppend += `<img class="locked" src="${spinner.path}"><p class="locked-info">Unlocks at ${spinner.unlockedAt} spins</p>`;
+      } else {
+        toAppend += `<img src="${spinner.path}">`
+      }
+
+      toAppend += '</li>';
+  }
+
+  domElements.pickerPane.innerHTML = toAppend;
   domElements.pickerPane.classList.remove('hidden');
   domElements.pickerPane.scrollTop = 0;
 }
