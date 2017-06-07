@@ -324,8 +324,13 @@ function setMutedSideEffects(muted: boolean) {
 }
 
 function togglePicker() {
-  appState.pickerOpen = !appState.pickerOpen;
-  domElements.pickerPane.classList.toggle('hidden', !appState.pickerOpen);
+  if (appState.pickerOpen !== true) {
+    appState.pickerOpen = !appState.pickerOpen;
+    history.pushState(appState, '', '#picker');
+    domElements.pickerPane.classList.remove('hidden');
+  } else {
+    history.back();
+  }
 }
 
 function toggleAudio(e: Event) {
@@ -386,4 +391,19 @@ function pickSpinner(e: Event) {
     USE_POINTER_EVENTS ? 'pointercancel' : 'touchcancel',
     touchEnd,
   );
+
+  // Assume clean entry always.
+  history.replaceState(null, '', '/');
+
+  window.onpopstate = (e: PopStateEvent) => {
+    // Assume if state is not set here picker is going to need to close.
+    if (e.state === null) {
+      appState.pickerOpen = false;
+      domElements.pickerPane.classList.add('hidden');
+    // Assume if state is set here picker is going to need to open.
+    } else if (e.state !== null) {
+      appState.pickerOpen = true;
+      domElements.pickerPane.classList.remove('hidden');
+    }
+  }
 })();
