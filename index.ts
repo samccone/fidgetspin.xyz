@@ -28,12 +28,20 @@ masterVolume.connect(ac.destination);
 const appState = {
   pickerOpen: false,
   spinner: window.localStorage.getItem('fidget_spinner') || './assets/spinners/base.png',
+  background: window.localStorage.getItem('fidget_background') || '',
+  music: window.localStorage.getItem('fidget_music') || '',
   muted: window.localStorage.getItem('fidget_muted') === 'true' ? true : false,
   spins: window.localStorage.getItem('fidget_spins') ? parseInt(window.localStorage.getItem('fidget_spins')!, 10) : 0,
   maxVelocity: window.localStorage.getItem('fidget_max_velocity') ? parseInt(window.localStorage.getItem('fidget_max_velocity')!, 10) : 0
 };
 
-const spinners = [
+const spinners: {
+  path: string,
+  name: string,
+  unlockedAt: number,
+  music?: string,
+  background?: string,
+}[] = [
   {
     path: './assets/spinners/base.png',
     name: 'The Classic',
@@ -58,6 +66,13 @@ const spinners = [
     path: './assets/spinners/fractal.png',
     name: 'The Fractal',
     unlockedAt: 10000
+  },
+  {
+    path: './assets/spinners/paul.png',
+    background: './assets/backgrounds/paul.jpg',
+    music: './assets/music/paul.wav',
+    name: 'The Irish',
+    unlockedAt: 0
   },
 ];
 
@@ -316,6 +331,10 @@ function spinSound2( magnitude: number ) {
   osc.stop(endPlayTime2);
 }
 
+const musicPlayer = document.createElement('audio');
+musicPlayer.autoplay = true;
+musicPlayer.loop = true;
+
 // Audio on IOS is very hard.
 // http://www.holovaty.com/writing/ios9-web-audio/
 // https://github.com/goldfire/howler.js/blob/8612912af28d6fb9f442c4f5a02827155bcf3464/src/howler.core.js#L278
@@ -346,6 +365,7 @@ function unlockAudio() {
 }
 
 function setMutedSideEffects(muted: boolean) {
+  musicPlayer.volume = appState.muted ? 0 : 1;
   domElements.toggleAudio.classList.toggle('muted', muted);
   masterVolume.gain.setValueAtTime(appState.muted ? 0 : 1, ac.currentTime);
   window.localStorage.setItem('fidget_muted', `${appState.muted}`);
@@ -378,10 +398,26 @@ function changeSpinner(src: string) {
   }
 }
 
+function changeBackground(src: string) {
+  appState.background = src;
+  deferWork(() => window.localStorage.setItem('fidget_background', src));
+
+  document.documentElement.style.backgroundImage = src ? `url("${src}")` : '';
+}
+
+function changeMusic(src: string) {
+  appState.music = src;
+  deferWork(() => window.localStorage.setItem('fidget_music', src));
+  musicPlayer.src = src;
+}
+
 function pickSpinner(e: Event) {
   const target = e.target as HTMLElement;
   if (target.tagName === 'IMG' && !target.classList.contains('locked')) {
-    changeSpinner((e.target as HTMLImageElement).src);
+    const img = e.target as HTMLImageElement;
+    changeSpinner(img.src);
+    changeBackground(img.getAttribute('data-background') || '');
+    changeMusic(img.getAttribute('data-music') || '');
     togglePicker();
   }
 }
@@ -396,7 +432,7 @@ function showPicker() {
       if (spinner.unlockedAt > appState.spins) {
         toAppend += `<img width="300" height="300" class="locked" src="${spinner.path}"><p class="locked-info">Unlocks at ${spinner.unlockedAt} spins</p>`;
       } else {
-        toAppend += `<img width="300" height="300" src="${spinner.path}">`
+        toAppend += `<img width="300" height="300" data-music="${spinner.music || ''}" data-background="${spinner.background || ''}" src="${spinner.path}">`
       }
 
       toAppend += '</li>';
@@ -449,6 +485,8 @@ function showPicker() {
   history.replaceState(null, '', '/');
 
   changeSpinner(appState.spinner);
+  changeBackground(appState.background);
+  changeMusic(appState.music);
 
   window.onpopstate = (e: PopStateEvent) => {
     // Assume if state is not set here picker is going to need to close.

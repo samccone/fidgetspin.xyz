@@ -1,5 +1,5 @@
 // TODO(samccone) figure out how to get the real types working.
-var VERSION = '14';
+var VERSION = '15';
 this.addEventListener('install', (e) => e.waitUntil(swInstall()));
 this.addEventListener('activate', (e) => e.waitUntil(swActivate()));
 this.addEventListener('fetch', (e) => e.respondWith(swFetch(e)));
