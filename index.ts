@@ -27,7 +27,7 @@ masterVolume.connect(ac.destination);
 
 const appState = {
   pickerOpen: false,
-  spinner: 'base',
+  spinner: window.localStorage.getItem('fidget_spinner') || './assets/spinners/base.png',
   muted: window.localStorage.getItem('fidget_muted') === 'true' ? true : false,
   spins: window.localStorage.getItem('fidget_spins') ? parseInt(window.localStorage.getItem('fidget_spins')!, 10) : 0,
   maxVelocity: window.localStorage.getItem('fidget_max_velocity') ? parseInt(window.localStorage.getItem('fidget_max_velocity')!, 10) : 0
@@ -342,6 +342,9 @@ function toggleAudio(e: Event) {
 }
 
 function changeSpinner(src: string) {
+  appState.spinner = src;
+  deferWork(() => window.localStorage.setItem('fidget_spinner', src));
+
   for (let s of domElements.spinners) {
     s.src = src;
   }
@@ -399,6 +402,8 @@ function showPicker() {
 
   // Assume clean entry always.
   history.replaceState(null, '', '/');
+
+  changeSpinner(appState.spinner);
 
   window.onpopstate = (e: PopStateEvent) => {
     // Assume if state is not set here picker is going to need to close.
