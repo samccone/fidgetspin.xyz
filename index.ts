@@ -1,36 +1,50 @@
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').then(function() {
-    console.log('service worker is is all cool.');
-  }).catch(function(e) {
-    console.error('service worker is not so cool.', e);
-    throw e;
-  });
+  navigator.serviceWorker
+    .register('./sw.js')
+    .then(function() {
+      console.log('service worker is all cool.');
+    })
+    .catch(function(e) {
+      console.error('service worker is not so cool.', e);
+      throw e;
+    });
 
   if (navigator.serviceWorker.controller) {
     // Correctly prompt the user to reload during SW phase change.
-    navigator.serviceWorker.controller.onstatechange = (e) => {
+    navigator.serviceWorker.controller.onstatechange = e => {
       if ((e.target as any).state === 'redundant') {
-        (document.querySelector('#reload-prompt')! as HTMLElement).classList.remove('hidden');
+        (document.querySelector(
+          '#reload-prompt'
+        )! as HTMLElement).classList.remove('hidden');
       }
-    }
+    };
   }
 }
 
 // thx https://github.com/Modernizr/Modernizr/blob/master/feature-detects/pointerevents.js
-const USE_POINTER_EVENTS = 'onpointerdown' in document.createElement('div') ;
+const USE_POINTER_EVENTS = 'onpointerdown' in document.createElement('div');
+const USE_TOUCH_EVENTS = 'ontouchdown' in document.createElement('div');
 
 let velocity = 0;
 
-const ac = new (typeof webkitAudioContext !== 'undefined' ? webkitAudioContext : AudioContext)();
+const ac = new (typeof webkitAudioContext !== 'undefined'
+  ? webkitAudioContext
+  : AudioContext)();
 const masterVolume = ac.createGain();
 masterVolume.connect(ac.destination);
 
 const appState = {
   pickerOpen: false,
-  spinner: window.localStorage.getItem('fidget_spinner') || './assets/spinners/base.png',
+  spinner:
+    window.localStorage.getItem('fidget_spinner') ||
+      './assets/spinners/base.png',
   muted: window.localStorage.getItem('fidget_muted') === 'true' ? true : false,
-  spins: window.localStorage.getItem('fidget_spins') ? parseInt(window.localStorage.getItem('fidget_spins')!, 10) : 0,
-  maxVelocity: window.localStorage.getItem('fidget_max_velocity') ? parseInt(window.localStorage.getItem('fidget_max_velocity')!, 10) : 0
+  spins: window.localStorage.getItem('fidget_spins')
+    ? parseInt(window.localStorage.getItem('fidget_spins')!, 10)
+    : 0,
+  maxVelocity: window.localStorage.getItem('fidget_max_velocity')
+    ? parseInt(window.localStorage.getItem('fidget_max_velocity')!, 10)
+    : 0
 };
 
 const spinners = [
@@ -46,7 +60,7 @@ const spinners = [
   },
   {
     path: './assets/spinners/pokeball.png',
-    name: 'The \'Chu',
+    name: "The 'Chu",
     unlockedAt: 2000
   },
   {
@@ -58,9 +72,8 @@ const spinners = [
     path: './assets/spinners/fractal.png',
     name: 'The Fractal',
     unlockedAt: 10000
-  },
+  }
 ];
-
 
 const domElements = {
   turns: document.getElementById('turns')!,
@@ -70,7 +83,9 @@ const domElements = {
   traceSlow: document.getElementById('trace-slow')!,
   traceFast: document.getElementById('trace-fast')!,
   toggleAudio: document.getElementById('toggle-audio')!,
-  spinners: Array.from(document.getElementsByClassName('spinner')!) as HTMLImageElement[],
+  spinners: Array.from(
+    document.getElementsByClassName('spinner')!
+  ) as HTMLImageElement[],
   pickerToggle: document.getElementById('picker')!,
   pickerPane: document.getElementById('spinner-picker')!
 };
@@ -79,8 +94,8 @@ let fidgetAlpha = 0;
 let fidgetSpeed = 0;
 
 function deferWork(fn: () => void) {
-  if (typeof requestIdleCallback as any !== 'undefined') {
-    requestIdleCallback(fn, {timeout: 60});
+  if ((typeof requestIdleCallback as any) !== 'undefined') {
+    requestIdleCallback(fn, { timeout: 60 });
   } else if (typeof requestAnimationFrame !== 'undefined') {
     requestAnimationFrame(fn);
   } else {
@@ -89,18 +104,30 @@ function deferWork(fn: () => void) {
 }
 
 function stats() {
-  velocity = Math.abs(fidgetSpeed * 60 /* fps */ * 60 /* sec */ / 2 / Math.PI) | 0;
-  const newMaxVelocity =  Math.max(velocity, appState.maxVelocity);
+  velocity =
+    Math.abs(fidgetSpeed * 60 /* fps */ * 60 /* sec */ / 2 / Math.PI) | 0;
+  const newMaxVelocity = Math.max(velocity, appState.maxVelocity);
 
   if (appState.maxVelocity !== newMaxVelocity) {
-    deferWork(() => window.localStorage.setItem('fidget_max_velocity', `${appState.maxVelocity}`));
+    deferWork(() =>
+      window.localStorage.setItem(
+        'fidget_max_velocity',
+        `${appState.maxVelocity}`
+      )
+    );
     appState.maxVelocity = newMaxVelocity;
   }
 
   appState.spins += Math.abs(fidgetSpeed / 2 / Math.PI);
-  deferWork(() => window.localStorage.setItem('fidget_spins', `${appState.spins}`));
-  const turnsText = appState.spins.toLocaleString(undefined, { maximumFractionDigits: 0 });
-  const maxVelText = appState.maxVelocity.toLocaleString(undefined, {maximumFractionDigits: 1});
+  deferWork(() =>
+    window.localStorage.setItem('fidget_spins', `${appState.spins}`)
+  );
+  const turnsText = appState.spins.toLocaleString(undefined, {
+    maximumFractionDigits: 0
+  });
+  const maxVelText = appState.maxVelocity.toLocaleString(undefined, {
+    maximumFractionDigits: 1
+  });
 
   domElements.turns.textContent = `${turnsText}`;
   domElements.velocity.textContent = `${velocity}`;
@@ -125,31 +152,35 @@ const touchInfo: {
 let touchSpeed = 0;
 let lastTouchAlpha = 0;
 
-function getXYFromTouchOrPointer(e: TouchEvent | PointerEvent) {
-  let x = 'touches' in e ? (e as TouchEvent).touches[0].clientX : (e as PointerEvent).clientX;
-  let y = 'touches' in e ? (e as TouchEvent).touches[0].clientY : (e as PointerEvent).clientY;
+function getXYFromTouchOrPointer(e: TouchEvent | PointerEvent | MouseEvent) {
+  let x = 'touches' in e
+    ? (e as TouchEvent).touches[0].clientX
+    : (e as PointerEvent).clientX;
+  let y = 'touches' in e
+    ? (e as TouchEvent).touches[0].clientY
+    : (e as PointerEvent).clientY;
 
-  return {x: x - centerX, y: y - centerY};
+  return { x: x - centerX, y: y - centerY };
 }
 
-function onTouchStart(e: TouchEvent | PointerEvent) {
+function onTouchStart(e: TouchEvent | PointerEvent | MouseEvent) {
   if (appState.pickerOpen) {
     return;
   }
 
-  let {x, y} = getXYFromTouchOrPointer(e);
+  let { x, y } = getXYFromTouchOrPointer(e);
   onTouchMove(e);
   touchInfo.down = true;
   touchInfo.radius = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
   lastTouchAlpha = touchInfo.alpha;
 }
 
-function onTouchMove(e: TouchEvent | PointerEvent) {
+function onTouchMove(e: TouchEvent | PointerEvent | MouseEvent) {
   if (appState.pickerOpen) {
     return;
   }
 
-  let {x, y} = getXYFromTouchOrPointer(e);
+  let { x, y } = getXYFromTouchOrPointer(e);
   touchInfo.alpha = Math.atan2(x, y);
   e.preventDefault();
 }
@@ -167,10 +198,8 @@ function tick() {
     if (touchInfo.down) {
       if (touchInfo.radius > centerRadius) {
         touchSpeed = touchInfo.alpha - lastTouchAlpha;
-        if (touchSpeed < - Math.PI)
-          touchSpeed += 2 * Math.PI;
-        if (touchSpeed > Math.PI)
-          touchSpeed -= 2 * Math.PI;
+        if (touchSpeed < -Math.PI) touchSpeed += 2 * Math.PI;
+        if (touchSpeed > Math.PI) touchSpeed -= 2 * Math.PI;
 
         fidgetSpeed = touchSpeed;
         lastTouchAlpha = touchInfo.alpha;
@@ -182,13 +211,18 @@ function tick() {
 
     fidgetAlpha -= fidgetSpeed;
     domElements.spinner.style.transform = `rotate(${fidgetAlpha}rad)`;
-    domElements.traceSlow.style.opacity = Math.abs(fidgetSpeed) > 0.2 ? '1' : '0.00001';
-    domElements.traceFast.style.opacity = Math.abs(fidgetSpeed) > 0.4 ? '1' : '0.00001';
+    domElements.traceSlow.style.opacity = Math.abs(fidgetSpeed) > 0.2
+      ? '1'
+      : '0.00001';
+    domElements.traceFast.style.opacity = Math.abs(fidgetSpeed) > 0.4
+      ? '1'
+      : '0.00001';
     stats();
 
     // Slow down over time
     fidgetSpeed = fidgetSpeed * 0.99;
-    fidgetSpeed = Math.sign(fidgetSpeed) * Math.max(0, (Math.abs(fidgetSpeed) - 2e-4));
+    fidgetSpeed =
+      Math.sign(fidgetSpeed) * Math.max(0, Math.abs(fidgetSpeed) - 2e-4);
 
     const soundMagnitude = Math.abs(velocity * Math.PI / 60);
     if (soundMagnitude && !touchInfo.down) {
@@ -199,7 +233,6 @@ function tick() {
     tick();
   });
 }
-
 
 //
 // Audio code
@@ -213,13 +246,13 @@ interface rangeArgs {
   inputMax: number;
   outputFloor: number;
   outputCeil: number;
-};
+}
 function generateRange(args: rangeArgs) {
-	return function (x: number):number {
-		const outputRange = args.outputCeil - args.outputFloor;
-		const inputPct = (x - args.inputMin) / (args.inputMax - args.inputMin);
-		return args.outputFloor + (inputPct * outputRange);
-  }
+  return function(x: number): number {
+    const outputRange = args.outputCeil - args.outputFloor;
+    const inputPct = (x - args.inputMin) / (args.inputMax - args.inputMin);
+    return args.outputFloor + inputPct * outputRange;
+  };
 }
 const freqRange400_2000 = generateRange({
   inputMin: 0,
@@ -237,25 +270,25 @@ const freqRange300_1500 = generateRange({
 const easeOutQuad = (t: number) => t * (2 - t);
 
 // assume magnitude is between 0 and 1, though it can be a tad higher
-function spinSound( magnitude: number ) {
+function spinSound(magnitude: number) {
   // automation start time
   let time = ac.currentTime;
   const freqMagnitude = magnitude;
   magnitude = Math.min(1, magnitude / 10);
-  let x = (easeOutQuad(magnitude) * 1.1) -(0.6 - (0.6 * easeOutQuad(magnitude)));
+  let x = easeOutQuad(magnitude) * 1.1 - (0.6 - 0.6 * easeOutQuad(magnitude));
 
   if (time + x - easeOutQuad(magnitude) < endPlayTime) {
-      return;
+    return;
   }
 
-  const osc  = ac.createOscillator();
+  const osc = ac.createOscillator();
   const gain = ac.createGain();
 
   // enforce range
-  magnitude = Math.min( 1, Math.max( 0, magnitude ) );
+  magnitude = Math.min(1, Math.max(0, magnitude));
 
   osc.type = 'triangle';
-  osc.connect( gain );
+  osc.connect(gain);
   gain.connect(masterVolume);
 
   // max of 40 boops
@@ -266,46 +299,46 @@ function spinSound( magnitude: number ) {
   // starting frequency (min of 400, max of 900)
   let freq = freqRange400_2000(freqMagnitude);
   // boop duration (longer for lower magnitude)
-  let dur = 0.1 * ( 1 - magnitude / 2 );
-  osc.frequency.setValueAtTime( freq, time );
-  osc.frequency.linearRampToValueAtTime( freq * 1.8, time += dur );
+  let dur = 0.1 * (1 - magnitude / 2);
+  osc.frequency.setValueAtTime(freq, time);
+  osc.frequency.linearRampToValueAtTime(freq * 1.8, (time += dur));
   endPlayTime = time + dur;
 
   // fade out the last boop
-  gain.gain.setValueAtTime(0.1,   ac.currentTime);
-  gain.gain.linearRampToValueAtTime( 0, endPlayTime );
+  gain.gain.setValueAtTime(0.1, ac.currentTime);
+  gain.gain.linearRampToValueAtTime(0, endPlayTime);
 
   // play it
   osc.start(ac.currentTime);
   osc.stop(endPlayTime);
 }
 
-function spinSound2( magnitude: number ) {
+function spinSound2(magnitude: number) {
   // automation start time
   let time = ac.currentTime;
   const freqMagnitude = magnitude;
   magnitude = Math.min(1, magnitude / 10);
-  let x = (easeOutQuad(magnitude) * 1.1) - (0.3 - (0.3 * easeOutQuad(magnitude)));
+  let x = easeOutQuad(magnitude) * 1.1 - (0.3 - 0.3 * easeOutQuad(magnitude));
 
   if (time + x - easeOutQuad(magnitude) < endPlayTime2) {
-      return;
+    return;
   }
 
-  const osc  = ac.createOscillator();
+  const osc = ac.createOscillator();
   const gain = ac.createGain();
 
   // enforce range
-  magnitude = Math.min( 1, Math.max( 0, magnitude ) );
+  magnitude = Math.min(1, Math.max(0, magnitude));
 
   osc.type = 'sine';
-  osc.connect( gain );
+  osc.connect(gain);
   gain.connect(masterVolume);
 
   var freq = freqRange300_1500(freqMagnitude);
   // boop duration (longer for lower magnitude)
   var dur = 0.05 * (1 - magnitude / 2);
   osc.frequency.setValueAtTime(freq, time);
-  osc.frequency.linearRampToValueAtTime(freq * 1.8, time += dur);
+  osc.frequency.linearRampToValueAtTime(freq * 1.8, (time += dur));
   endPlayTime2 = time + dur;
   // fade out the last boop
   gain.gain.setValueAtTime(0.15, ac.currentTime);
@@ -323,7 +356,7 @@ function unlockAudio() {
   function unlock() {
     // Create an empty buffer.
     const source = ac.createBufferSource();
-    source.buffer = ac.createBuffer(1, 1, 22050);;
+    source.buffer = ac.createBuffer(1, 1, 22050);
     source.connect(ac.destination);
 
     // Play the empty buffer.
@@ -391,15 +424,15 @@ function showPicker() {
   let toAppend = '';
 
   for (let spinner of spinners) {
-      toAppend += `<li><p class="title">${spinner.name}</p>`;
+    toAppend += `<li><p class="title">${spinner.name}</p>`;
 
-      if (spinner.unlockedAt > appState.spins) {
-        toAppend += `<img width="300" height="300" class="locked" src="${spinner.path}"><p class="locked-info">Unlocks at ${spinner.unlockedAt} spins</p>`;
-      } else {
-        toAppend += `<img width="300" height="300" src="${spinner.path}">`
-      }
+    if (spinner.unlockedAt > appState.spins) {
+      toAppend += `<img width="300" height="300" class="locked" src="${spinner.path}"><p class="locked-info">Unlocks at ${spinner.unlockedAt} spins</p>`;
+    } else {
+      toAppend += `<img width="300" height="300" src="${spinner.path}">`;
+    }
 
-      toAppend += '</li>';
+    toAppend += '</li>';
   }
 
   domElements.pickerPane.innerHTML = toAppend;
@@ -414,35 +447,53 @@ function showPicker() {
   const listenFor = document.addEventListener as WhatWGAddEventListener;
 
   domElements.pickerToggle.addEventListener(
-    USE_POINTER_EVENTS ? 'pointerdown' : 'touchstart',
-    togglePicker);
+    USE_POINTER_EVENTS
+      ? 'pointerdown'
+      : USE_TOUCH_EVENTS ? 'touchstart' : 'mousedown',
+    togglePicker
+  );
 
   domElements.pickerPane.addEventListener('click', pickSpinner);
 
   domElements.toggleAudio.addEventListener(
-    USE_POINTER_EVENTS ? 'pointerdown' : 'touchstart',
-    toggleAudio);
+    USE_POINTER_EVENTS
+      ? 'pointerdown'
+      : USE_TOUCH_EVENTS ? 'touchstart' : 'mousedown',
+    toggleAudio
+  );
 
   listenFor(
-    USE_POINTER_EVENTS ? 'pointerdown' : 'touchstart',
+    USE_POINTER_EVENTS
+      ? 'pointerdown'
+      : USE_TOUCH_EVENTS ? 'touchstart' : 'mousedown',
     onTouchStart,
-    {passive: false}
+    {
+      passive: false
+    }
   );
 
   listenFor(
-    USE_POINTER_EVENTS ? 'pointermove' : 'touchmove',
+    USE_POINTER_EVENTS
+      ? 'pointermove'
+      : USE_TOUCH_EVENTS ? 'touchstart' : 'mousemove',
     onTouchMove,
-    {passive: false}
+    {
+      passive: false
+    }
   );
 
   listenFor(
-    USE_POINTER_EVENTS ? 'pointerup' : 'touchend',
-    touchEnd,
+    USE_POINTER_EVENTS
+      ? 'pointerup'
+      : USE_TOUCH_EVENTS ? 'touchend' : 'mouseup',
+    touchEnd
   );
 
   listenFor(
-    USE_POINTER_EVENTS ? 'pointercancel' : 'touchcancel',
-    touchEnd,
+    USE_POINTER_EVENTS
+      ? 'pointercancel'
+      : USE_TOUCH_EVENTS ? 'touchcancel' : 'mouseleave',
+    touchEnd
   );
 
   // Assume clean entry always.
@@ -455,10 +506,10 @@ function showPicker() {
     if (e.state === null) {
       appState.pickerOpen = false;
       domElements.pickerPane.classList.add('hidden');
-    // Assume if state is set here picker is going to need to open.
+      // Assume if state is set here picker is going to need to open.
     } else if (e.state !== null) {
       appState.pickerOpen = true;
       showPicker();
     }
-  }
+  };
 })();
