@@ -8,9 +8,15 @@ interface ExtendableEvent {
 
 var VERSION = '13';
 
-this.addEventListener('install', (e: ExtendableEvent) => e.waitUntil(swInstall()));
-this.addEventListener('activate', (e: ExtendableEvent) => e.waitUntil(swActivate()));
-this.addEventListener('fetch', (e: ExtendableEvent) => e.respondWith(swFetch(e)));
+this.addEventListener('install', (e: ExtendableEvent) =>
+  e.waitUntil(swInstall())
+);
+this.addEventListener('activate', (e: ExtendableEvent) =>
+  e.waitUntil(swActivate())
+);
+this.addEventListener('fetch', (e: ExtendableEvent) =>
+  e.respondWith(swFetch(e))
+);
 
 async function swInstall() {
   const rs = await fetch('./bundle.txt');
@@ -25,27 +31,24 @@ async function swActivate() {
   let deletes = [];
 
   for (var key of keys) {
-    if (key !== VERSION)
-      deletes.push(caches.delete(key));
+    if (key !== VERSION) deletes.push(caches.delete(key));
   }
 
   await Promise.all(deletes);
-  await this.clients.claim()
+  await this.clients.claim();
 }
 
 async function swFetch(e: ExtendableEvent) {
   var networkFetch = fetchFromNetworkAndCache(e);
   const cache = await caches.open(VERSION);
   const response = await cache.match(e.request);
-  if (response)
-    return response;
+  if (response) return response;
   return networkFetch;
 }
 
 async function fetchFromNetworkAndCache(e: ExtendableEvent) {
   if (new URL(e.request.url).origin !== location.origin) {
-    return new Response(new Blob(),
-                        {"status" : 404, "statusText" : "Not found"});
+    return new Response(new Blob(), { status: 404, statusText: 'Not found' });
   }
 
   const res = await fetch(e.request);
