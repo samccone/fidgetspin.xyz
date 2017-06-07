@@ -3,3 +3,5 @@ node_modules
 /main.css
 /index.js
 /sw.js
+externs.js
+tmp.js
