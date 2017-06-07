@@ -4,6 +4,7 @@
     "build": "tsc && npm run build-css",
     "build-dist-js": "yarn run build-tsickle && yarn run closure-compile",
     "closure-compile": "cat index.js > tmp.js && cat tmp.js | java -jar ./node_modules/google-closure-compiler/compiler.jar --language_in=ECMASCRIPT6 --language_out=ECMASCRIPT5 --externs=externs.js --compilation_level ADVANCED_OPTIMIZATIONS --rewrite_polyfills=false | tee > index.js",
+    "closure-compile-sw": "cat sw.js > sw_tmp.js && cat sw_tmp.js | java -jar ./node_modules/google-closure-compiler/compiler.jar --language_in=ECMASCRIPT6 --language_out=ECMASCRIPT5 --externs=sw_externs.js --compilation_level ADVANCED_OPTIMIZATIONS --rewrite_polyfills=false > sw.js",
     "build-tsickle": "tsickle --externs=externs.js -- -p .",
     "watch": "tsc -w",
     "watch-css": "yarn build-css -- -w",
