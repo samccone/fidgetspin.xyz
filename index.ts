@@ -70,7 +70,7 @@ const spinners: {
   {
     path: './assets/spinners/paul.png',
     background: './assets/backgrounds/paul.jpg',
-    music: './assets/music/paul.wav',
+    music: './assets/music/paul.mp3',
     name: 'The Irish',
     unlockedAt: 0
   },
