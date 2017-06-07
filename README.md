@@ -5,6 +5,8 @@ Fidget Spin
 
 Play it live [fidgetspin.xyz](https://www.fidgetspin.xyz)
 
+Made by the amazing [Susie Lu](https://github.com/susielu), [Paul Irish](https://github.com/paulirish), and [Pavel Feldman](https://github.com/pavelfeldman), and Sam
+
 [![App Preview](assets/preview.png)](https://www.fidgetspin.xyz/)
 
 
