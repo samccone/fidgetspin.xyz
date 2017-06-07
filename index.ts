@@ -67,6 +67,7 @@ const domElements = {
   velocity: document.getElementById('velocity')!,
   maxVelocity: document.getElementById('maxVelocity')!,
   spinner: document.getElementById('spinner')!,
+  spinnerContainer: document.getElementById('spinner-container')!,
   traceSlow: document.getElementById('trace-slow')!,
   traceFast: document.getElementById('trace-fast')!,
   toggleAudio: document.getElementById('toggle-audio')!,
@@ -351,12 +352,22 @@ function setMutedSideEffects(muted: boolean) {
   window.localStorage.setItem('fidget_muted', `${appState.muted}`);
 }
 
+function showSpinner() {
+  domElements.spinnerContainer.classList.remove('hide');
+}
+
+function hideSpinner() {
+  domElements.spinnerContainer.classList.add('hide');
+}
+
 function togglePicker() {
   if (appState.pickerOpen !== true) {
     appState.pickerOpen = !appState.pickerOpen;
     history.pushState(appState, '', '#picker');
+    hideSpinner();
     showPicker();
   } else {
+    showSpinner()
     history.back();
   }
 }
@@ -394,9 +405,9 @@ function showPicker() {
       toAppend += `<li><p class="title">${spinner.name}</p>`;
 
       if (spinner.unlockedAt > appState.spins) {
-        toAppend += `<img width="300" height="300" class="locked" src="${spinner.path}"><p class="locked-info">Unlocks at ${spinner.unlockedAt} spins</p>`;
+        toAppend += `<img width="340" height="340" class="locked" src="${spinner.path}"><p class="locked-info">Unlocks at ${spinner.unlockedAt} spins</p>`;
       } else {
-        toAppend += `<img width="300" height="300" src="${spinner.path}">`
+        toAppend += `<img width="340" height="340" src="${spinner.path}">`
       }
 
       toAppend += '</li>';
