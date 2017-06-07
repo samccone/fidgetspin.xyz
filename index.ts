@@ -2,7 +2,7 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker
     .register('./sw.js')
     .then(function() {
-      console.log('service worker is is all cool.');
+      console.log('service worker is all cool.');
     })
     .catch(function(e) {
       console.error('service worker is not so cool.', e);
