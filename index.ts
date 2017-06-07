@@ -2,7 +2,7 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker
     .register('./sw.js')
     .then(function() {
-      console.log('service worker is is all cool.');
+      console.log('service worker is all cool.');
     })
     .catch(function(e) {
       console.error('service worker is not so cool.', e);
@@ -23,6 +23,7 @@ if ('serviceWorker' in navigator) {
 
 // thx https://github.com/Modernizr/Modernizr/blob/master/feature-detects/pointerevents.js
 const USE_POINTER_EVENTS = 'onpointerdown' in document.createElement('div');
+const USE_TOUCH_EVENTS = 'ontouchdown' in document.createElement('div');
 
 let velocity = 0;
 
@@ -151,7 +152,7 @@ const touchInfo: {
 let touchSpeed = 0;
 let lastTouchAlpha = 0;
 
-function getXYFromTouchOrPointer(e: TouchEvent | PointerEvent) {
+function getXYFromTouchOrPointer(e: TouchEvent | PointerEvent | MouseEvent) {
   let x = 'touches' in e
     ? (e as TouchEvent).touches[0].clientX
     : (e as PointerEvent).clientX;
@@ -162,7 +163,7 @@ function getXYFromTouchOrPointer(e: TouchEvent | PointerEvent) {
   return { x: x - centerX, y: y - centerY };
 }
 
-function onTouchStart(e: TouchEvent | PointerEvent) {
+function onTouchStart(e: TouchEvent | PointerEvent | MouseEvent) {
   if (appState.pickerOpen) {
     return;
   }
@@ -174,7 +175,7 @@ function onTouchStart(e: TouchEvent | PointerEvent) {
   lastTouchAlpha = touchInfo.alpha;
 }
 
-function onTouchMove(e: TouchEvent | PointerEvent) {
+function onTouchMove(e: TouchEvent | PointerEvent | MouseEvent) {
   if (appState.pickerOpen) {
     return;
   }
@@ -446,28 +447,54 @@ function showPicker() {
   const listenFor = document.addEventListener as WhatWGAddEventListener;
 
   domElements.pickerToggle.addEventListener(
-    USE_POINTER_EVENTS ? 'pointerdown' : 'touchstart',
+    USE_POINTER_EVENTS
+      ? 'pointerdown'
+      : USE_TOUCH_EVENTS ? 'touchstart' : 'mousedown',
     togglePicker
   );
 
   domElements.pickerPane.addEventListener('click', pickSpinner);
 
   domElements.toggleAudio.addEventListener(
-    USE_POINTER_EVENTS ? 'pointerdown' : 'touchstart',
+    USE_POINTER_EVENTS
+      ? 'pointerdown'
+      : USE_TOUCH_EVENTS ? 'touchstart' : 'mousedown',
     toggleAudio
   );
 
-  listenFor(USE_POINTER_EVENTS ? 'pointerdown' : 'touchstart', onTouchStart, {
-    passive: false
-  });
+  listenFor(
+    USE_POINTER_EVENTS
+      ? 'pointerdown'
+      : USE_TOUCH_EVENTS ? 'touchstart' : 'mousedown',
+    onTouchStart,
+    {
+      passive: false
+    }
+  );
 
-  listenFor(USE_POINTER_EVENTS ? 'pointermove' : 'touchmove', onTouchMove, {
-    passive: false
-  });
+  listenFor(
+    USE_POINTER_EVENTS
+      ? 'pointermove'
+      : USE_TOUCH_EVENTS ? 'touchstart' : 'mousemove',
+    onTouchMove,
+    {
+      passive: false
+    }
+  );
 
-  listenFor(USE_POINTER_EVENTS ? 'pointerup' : 'touchend', touchEnd);
+  listenFor(
+    USE_POINTER_EVENTS
+      ? 'pointerup'
+      : USE_TOUCH_EVENTS ? 'touchend' : 'mouseup',
+    touchEnd
+  );
 
-  listenFor(USE_POINTER_EVENTS ? 'pointercancel' : 'touchcancel', touchEnd);
+  listenFor(
+    USE_POINTER_EVENTS
+      ? 'pointercancel'
+      : USE_TOUCH_EVENTS ? 'touchcancel' : 'mouseleave',
+    touchEnd
+  );
 
   // Assume clean entry always.
   history.replaceState(null, '', '/');
