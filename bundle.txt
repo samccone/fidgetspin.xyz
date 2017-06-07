@@ -10,4 +10,5 @@
 ./assets/spinners/cube.png
 ./assets/spinners/triple.png
 ./assets/spinners/pokeball.png
+./assets/spinners/fractal.png
 ./sw.js

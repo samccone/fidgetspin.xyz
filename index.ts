@@ -54,6 +54,11 @@ const spinners = [
     name: 'The Cubist',
     unlockedAt: 5000
   },
+  {
+    path: './assets/spinners/fractal.png',
+    name: 'The Fractal',
+    unlockedAt: 10000
+  },
 ];
 
 
