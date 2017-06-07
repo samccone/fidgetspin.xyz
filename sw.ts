@@ -6,7 +6,7 @@ interface ExtendableEvent {
   request: any;
 }
 
-var VERSION = '9';
+var VERSION = '11';
 
 this.addEventListener('install', (e: ExtendableEvent) => e.waitUntil(swInstall()));
 this.addEventListener('activate', (e: ExtendableEvent) => e.waitUntil(swActivate()));
@@ -16,15 +16,21 @@ async function swInstall() {
   const rs = await fetch('./bundle.txt');
   const body = await rs.text();
   const cache = await caches.open(VERSION);
-  return cache.addAll(body.trim().split('\n'));
+  await cache.addAll(body.trim().split('\n'));
+  await this.skipWaiting();
 }
 
 async function swActivate() {
   const keys = await caches.keys();
+  let deletes = [];
+
   for (var key of keys) {
     if (key !== VERSION)
-      caches.delete(key);
+      deletes.push(caches.delete(key));
   }
+
+  await Promise.all(deletes);
+  await this.clients.claim()
 }
 
 async function swFetch(e: ExtendableEvent) {

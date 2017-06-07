@@ -5,6 +5,15 @@ if ('serviceWorker' in navigator) {
     console.error('service worker is not so cool.', e);
     throw e;
   });
+
+  if (navigator.serviceWorker.controller) {
+    // Correctly prompt the user to reload during SW phase change.
+    navigator.serviceWorker.controller.onstatechange = (e) => {
+      if ((e.target as any).state === 'redundant') {
+        (document.querySelector('#reload-prompt')! as HTMLElement).classList.remove('hidden');
+      }
+    }
+  }
 }
 
 // thx https://github.com/Modernizr/Modernizr/blob/master/feature-detects/pointerevents.js
