@@ -1,6 +1,6 @@
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').then(function() {
-    console.log('service worker is is all cool.');
+    console.log('service worker is all cool.');
   }).catch(function(e) {
     console.error('service worker is not so cool.', e);
     throw e;
@@ -17,7 +17,7 @@ if ('serviceWorker' in navigator) {
 }
 
 // thx https://github.com/Modernizr/Modernizr/blob/master/feature-detects/pointerevents.js
-const USE_POINTER_EVENTS = 'onpointerdown' in document.createElement('div') ;
+const USE_POINTER_EVENTS = 'onpointerdown' in document.createElement('div');
 
 let velocity = 0;
 
@@ -215,10 +215,10 @@ interface rangeArgs {
   outputCeil: number;
 };
 function generateRange(args: rangeArgs) {
-	return function (x: number):number {
-		const outputRange = args.outputCeil - args.outputFloor;
-		const inputPct = (x - args.inputMin) / (args.inputMax - args.inputMin);
-		return args.outputFloor + (inputPct * outputRange);
+  return function (x: number): number {
+    const outputRange = args.outputCeil - args.outputFloor;
+    const inputPct = (x - args.inputMin) / (args.inputMax - args.inputMin);
+    return args.outputFloor + (inputPct * outputRange);
   }
 }
 const freqRange400_2000 = generateRange({
@@ -245,7 +245,7 @@ function spinSound( magnitude: number ) {
   let x = (easeOutQuad(magnitude) * 1.1) -(0.6 - (0.6 * easeOutQuad(magnitude)));
 
   if (time + x - easeOutQuad(magnitude) < endPlayTime) {
-      return;
+    return;
   }
 
   const osc  = ac.createOscillator();
@@ -288,7 +288,7 @@ function spinSound2( magnitude: number ) {
   let x = (easeOutQuad(magnitude) * 1.1) - (0.3 - (0.3 * easeOutQuad(magnitude)));
 
   if (time + x - easeOutQuad(magnitude) < endPlayTime2) {
-      return;
+    return;
   }
 
   const osc  = ac.createOscillator();
@@ -391,15 +391,15 @@ function showPicker() {
   let toAppend = '';
 
   for (let spinner of spinners) {
-      toAppend += `<li><p class="title">${spinner.name}</p>`;
+    toAppend += `<li><p class="title">${spinner.name}</p>`;
 
-      if (spinner.unlockedAt > appState.spins) {
-        toAppend += `<img width="300" height="300" class="locked" src="${spinner.path}"><p class="locked-info">Unlocks at ${spinner.unlockedAt} spins</p>`;
-      } else {
-        toAppend += `<img width="300" height="300" src="${spinner.path}">`
-      }
+    if (spinner.unlockedAt > appState.spins) {
+      toAppend += `<img width="300" height="300" class="locked" src="${spinner.path}"><p class="locked-info">Unlocks at ${spinner.unlockedAt} spins</p>`;
+    } else {
+      toAppend += `<img width="300" height="300" src="${spinner.path}">`
+    }
 
-      toAppend += '</li>';
+    toAppend += '</li>';
   }
 
   domElements.pickerPane.innerHTML = toAppend;
