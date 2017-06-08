@@ -393,7 +393,7 @@ function showPicker() {
   for (let spinner of spinners) {
       toAppend += `<li><p class="title">${spinner.name}</p>`;
 
-      if (spinner.unlockedAt > appState.spins) {
+      if (spinner.unlockedAt >= appState.spins) {
         toAppend += `<img width="300" height="300" class="locked" src="${spinner.path}"><p class="locked-info">Unlocks at ${spinner.unlockedAt} spins</p>`;
       } else {
         toAppend += `<img width="300" height="300" src="${spinner.path}">`
