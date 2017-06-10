@@ -26,20 +26,12 @@ const prettierCmd = path.resolve(
   '../../node_modules/.bin/' + prettier
 );
 const defaultOptions = {
-  'bracket-spacing': 'false',
-  'single-quote': 'true',
   'single-quote': 'true',
   parser: 'typescript'
 };
 const config = {
   default: {
     patterns: ['*.ts']
-  },
-  scripts: {
-    patterns: ['*.js'],
-    options: {
-      parser: 'babylon'
-    }
   }
 };
 
