@@ -10,7 +10,6 @@ before_script:
 script:
 - yarn run build-css
 - yarn run build-dist-js
-- yarn test-formatting
 - echo "node_modules" > .gitignore
 env:
   global:

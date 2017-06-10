@@ -18,10 +18,6 @@
     "*.ts": [
       "prettier --write --single-quote --parser=typescript",
       "git add"
-    ],
-    "*.js": [
-      "prettier --write --single-quote",
-      "git add"
     ]
   },
   "browserslist": [
