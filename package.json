@@ -11,7 +11,8 @@
     "start": "http-server",
     "now-start": "http-server -p 80",
     "precommit": "lint-staged",
-    "test": "node scripts/prettier"
+    "test-formatting": "node scripts/prettier",
+    "format-code": "prettier *.ts --write --single-quote"
   },
   "lint-staged": {
     "*.ts": [
