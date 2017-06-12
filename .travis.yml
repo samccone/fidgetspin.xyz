@@ -1,0 +1,25 @@
+language: node_js
+sudo: false
+node_js:
+- '7'
+cache: yarn
+before_script:
+- yarn install
+- git config --global user.email "travis@fidgetspin.xyz"
+- git config --global user.name "TRAVIS-CI"
+script:
+- yarn run build-css
+- yarn run build-dist-js
+- echo "node_modules" > .gitignore
+env:
+  global:
+  - secure: I4B4225tRne/Bjrr9Jw2MNipifpxf0EVu4S0VEWMmNC/H2rsW8jFFhzKGShDjD9XA4OBu8NSuT/V5X744Soc0EfsAuwt4dkgIZeewzdG0x10QVniYta929z/siDNQrvOy2HdHcnX4W+E0Eya9U0Qb5eR1iCCtLYYnb7eFFdBZdfFcC7Osjv4vPaTLWNOfeosWuzvoocwfl0U3AglP1Ot2g74HpzPeo0INaEUmk07NwqMqjArGxmR+onO6T0fKSNbh+6DTIVguYNZect8tTktJtq2rEhnX9nuw8zAqjvSIWMvvXbiZSbsIcTttyH66uJTtVDyKicIaanVEEmWGjjCN6siPFhU7bVyUuQnVJT9vC0ec/bHmua8cjpB1kA5NBysp7mPLQhHEf9XsLwXFoIAgPAalFjU4+dlwdcUfv1l2GKdBTIRYH3+ymna4Bc0UD6cCamnfr/1koPQgpvn9OTf+gRopgg6G+joIjbKxT4lL/8P/hhGqm6OshVXqLvVeNpM5SUFyZVzVy/yUTiMwVdwFVuIyxJMeCjxn8PJQkI5RmELFaQnlPV4j9b2eS2y59Thp4jtxK5lzixYaEC7r9g/26IJdAl5IDA7hWhPIzaf76vObYDqcLA+eZEKOSsJqC1KtRgBco/JohNvsNUZL5HqbwJmYToCbNw7EglXdUFkl0M=
+  - secure: ESPPS7ecYTzDdaZQixLlDqEweMuEM3156AeAPgyUnQkz0yKO1nsCFYV9io6MHappWjsoILCRx4ntDfhs49kiOF9kTjqb7PwB3p3cQvJIv3k1C4G5bR/Nicck9lbi7h9ClHVe/tcWjVSvZka2Tk+uxLcYgoV9BBInhw6q9N4R+MbN0HI6Y8oSSJ0V3RbwiHzJI+Sya3LXIaJooecTWrCydLdnJNf/p7v/JYQKDMsGM9H6lTfGgDqZYPtfuYBXJ0lPLbmw20jrORaDm+b2wmtHPrS8cWWPFZXV5PGpYA3MS36kuqvWXF2POcAAh3qDf/bFnn9qJ2X0wtvXGvkuFQrjZ20PK4MN3aeh/dx4r38QnwWrjZn6Tlq3oaKB+ilSESYsAfeWjLFQ43U5dVYn8Fr1e2ym7Sa0g/XGZna11tLe8Ao4pBEIn2acIH4Bez+ifaW7Z4z6p5xzM/S7fYSN58PlIM4LRtBVLBaJ1msm3yMGiD6RBZTFbFEQJrX8aRxBWMLXj/vTzg5LZ4nvb8Y01icd4UAFMI9N7uQzqfO5V8R7zUBKexKVlHhyUD4AiHtWK+Vk2xFcUPKIkvfOb+ske9Llk3ABnuoC4hylesyxOuvzBu0wQuhSP5M6/oTTr3nLogjMU+NUa4qKcf7NJCotxVKNUwAvvN4lRVC6LEd+koxRWkI=
+
+# https://docs.travis-ci.com/user/deployment/pages/
+deploy:
+  provider: pages # gh-pages
+  skip_cleanup: true
+  github_token: $GH_TOKEN
+  on:
+    branch: master

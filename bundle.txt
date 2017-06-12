@@ -1,0 +1,14 @@
+./
+./assets/background.png
+./assets/dark_rotate.svg
+./assets/rotate.svg
+./assets/speed_icon.svg
+./index.html
+./index.js
+./main.css
+./assets/spinners/base.png
+./assets/spinners/cube.png
+./assets/spinners/triple.png
+./assets/spinners/pokeball.png
+./assets/spinners/fractal.png
+./sw.js

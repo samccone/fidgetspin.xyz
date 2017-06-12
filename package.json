@@ -1,0 +1,67 @@
+{
+  "name": "fidgetspin",
+  "version": "1.0.0",
+  "description": "Fidget Spin progressive web app",
+  "keywords": [
+    "fidget-spin",
+    "fidgetspin",
+    "fidget-spinner",
+    "fidgetspinner",
+    "fidget",
+    "spin",
+    "spinner",
+    "pwa",
+    "progressive-web-app",
+    "progressivewebapp",
+    "webapk",
+    "offline-first"
+  ],
+  "homepage": "https://fidgetspin.xyz",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/samccone/fidgetspin.xyz.git"
+  },
+  "bugs": {
+    "url": "https://github.com/samccone/fidgetspin.xyz/issues"
+  },
+  "author": "Sam Saccone (https://github.com/samccone)",
+  "license": "MIT",
+  "scripts": {
+    "build-css": "./node_modules/.bin/postcss ./assets/main.css --use ../../node_modules/autoprefixer/lib/autoprefixer.js -o main.css",
+    "build": "tsc && npm run build-css",
+    "build-dist-js": "yarn run build-tsickle && yarn run closure-compile",
+    "closure-compile": "cat index.js > tmp.js && cat tmp.js | java -jar ./node_modules/google-closure-compiler/compiler.jar --language_in=ECMASCRIPT6 --language_out=ECMASCRIPT5 --externs=externs.js --compilation_level ADVANCED_OPTIMIZATIONS --rewrite_polyfills=false | tee > index.js",
+    "closure-compile-sw": "cat sw.js > sw_tmp.js && cat sw_tmp.js | java -jar ./node_modules/google-closure-compiler/compiler.jar --language_in=ECMASCRIPT6 --language_out=ECMASCRIPT5 --externs=sw_externs.js --compilation_level ADVANCED_OPTIMIZATIONS --rewrite_polyfills=false > sw.js",
+    "build-tsickle": "tsickle --externs=externs.js -- -p .",
+    "watch": "tsc -w",
+    "watch-css": "yarn build-css -- -w",
+    "start": "http-server",
+    "now-start": "http-server -p 80",
+    "precommit": "lint-staged",
+    "test-formatting": "node scripts/prettier",
+    "format-code": "prettier *.ts --write --single-quote"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "prettier --write --single-quote --parser=typescript",
+      "git add"
+    ]
+  },
+  "browserslist": [
+    "> 5%"
+  ],
+  "dependencies": {
+    "typescript": "^2.3.3"
+  },
+  "devDependencies": {
+    "autoprefixer": "^7.1.1",
+    "chalk": "^1.1.3",
+    "google-closure-compiler": "^20170521.0.0",
+    "http-server": "^0.10.0",
+    "husky": "^0.13.4",
+    "lint-staged": "^3.6.0",
+    "postcss-cli": "^4.0.0",
+    "prettier": "^1.4.2",
+    "tsickle": "^0.23.3"
+  }
+}

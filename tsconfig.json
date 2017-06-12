@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "lib": [ "es2015", "dom" ],
+        "target": "es2017",
+        "noImplicitAny": true,
+        "inlineSourceMap": true,
+        "noEmitOnError": false,
+        "strictNullChecks": true,
+        "noImplicitReturns": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noEmitHelpers": true
+    },
+    "exclude": [
+        "node_modules"
+    ],
+    "include": [
+        "*.ts"
+    ]
+}
