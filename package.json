@@ -1,4 +1,31 @@
 {
+  "name": "fidgetspin",
+  "version": "1.0.0",
+  "description": "Fidget Spin progressive web app",
+  "keywords": [
+    "fidget-spin",
+    "fidgetspin",
+    "fidget-spinner",
+    "fidgetspinner",
+    "fidget",
+    "spin",
+    "spinner",
+    "pwa",
+    "progressive-web-app",
+    "progressivewebapp",
+    "webapk",
+    "offline-first"
+  ],
+  "homepage": "https://fidgetspin.xyz",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/samccone/fidgetspin.xyz.git"
+  },
+  "bugs": {
+    "url": "https://github.com/samccone/fidgetspin.xyz/issues"
+  },
+  "author": "Sam Saccone (https://github.com/samccone)",
+  "license": "MIT",
   "scripts": {
     "build-css": "./node_modules/.bin/postcss ./assets/main.css --use ../../node_modules/autoprefixer/lib/autoprefixer.js -o main.css",
     "build": "tsc && npm run build-css",
